@@ -95,7 +95,7 @@ function CommandShell() {
     <div className="min-h-screen w-full bg-[#09090B] text-zinc-100 flex justify-center">
       <div className="relative flex min-h-screen w-full max-w-[430px] flex-col bg-[#09090B] sm:border-x sm:border-white/[0.08]">
         {/* Top Status Header */}
-        <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#09090B]/90 px-4 pt-3 pb-2.5 backdrop-blur-md">
+        <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#09090B]/90 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2.5 backdrop-blur-md">
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
