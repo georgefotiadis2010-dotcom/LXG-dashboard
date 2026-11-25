@@ -13,15 +13,11 @@ export interface MetricTarget {
 
 export interface LxgMetrics {
   monthlyListeners: number;
-  monthlyListenersRaw: number;
   spotifyFollowers: number;
   allTimeStreams: number;
-  weeklyOrganicStreams: string;
   topSingleStreams: number;
   topSingleName: string;
   instagramFollowers: number;
-  instagramOrganicFollowers: number;
-  instagramSchoolSpikeFollowers: number;
   topReelViews: number;
   topReelName: string;
   catalogReleases: number;
@@ -81,7 +77,6 @@ export type SyncStatus = 'idle' | 'syncing' | 'success' | 'error';
 export interface LxgState {
   version: number;
   horizonDate: string;
-  organicMode: boolean;
   schoolMode: boolean;
   metrics: LxgMetrics;
   pipeline: ReleasePipelineItem[];
@@ -100,7 +95,6 @@ export interface LxgContextValue {
   updateMetrics: (patch: Partial<LxgMetrics>) => void;
   addReel: (reel: NewReelInput) => void;
   toggleChecklistItem: (id: string) => void;
-  toggleOrganicMode: () => void;
   toggleSchoolMode: () => void;
   updateSyncSettings: (patch: Partial<SyncSettings>) => void;
   replaceFromRemote: (remoteState: LxgState) => void;

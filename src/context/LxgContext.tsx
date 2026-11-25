@@ -163,19 +163,14 @@ export const INITIAL_REELS: ReelEntry[] = [
 export const INITIAL_STATE: LxgState = {
   version: 1,
   horizonDate: 'Dec 20, 2027',
-  organicMode: true,
   schoolMode: false,
   metrics: {
     monthlyListeners: 40,
-    monthlyListenersRaw: 29,
     spotifyFollowers: 32,
     allTimeStreams: 350,
-    weeklyOrganicStreams: '~24-29/wk organic',
     topSingleStreams: 59,
     topSingleName: 'Best Thing (28d)',
     instagramFollowers: 123,
-    instagramOrganicFollowers: 34,
-    instagramSchoolSpikeFollowers: 89,
     topReelViews: 1212,
     topReelName: 'studio lately..',
     catalogReleases: 2,
@@ -410,10 +405,6 @@ export const LxgProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     [pushMutation]
   );
 
-  const toggleOrganicMode = useCallback(() => {
-    setState((prev) => ({ ...prev, organicMode: !prev.organicMode }));
-  }, []);
-
   const toggleSchoolMode = useCallback(() => {
     setState((prev) => ({ ...prev, schoolMode: !prev.schoolMode }));
   }, []);
@@ -536,7 +527,6 @@ export const LxgProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateMetrics,
       addReel,
       toggleChecklistItem,
-      toggleOrganicMode,
       toggleSchoolMode,
       updateSyncSettings,
       replaceFromRemote,
@@ -549,7 +539,6 @@ export const LxgProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateMetrics,
       addReel,
       toggleChecklistItem,
-      toggleOrganicMode,
       toggleSchoolMode,
       updateSyncSettings,
       replaceFromRemote,

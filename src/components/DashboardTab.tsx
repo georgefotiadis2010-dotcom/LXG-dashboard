@@ -73,7 +73,7 @@ function getPaceStatus(pct: number): {
 
 export const DashboardTab: React.FC = () => {
   const { state, incrementMetric } = useLxg();
-  const { metrics, organicMode, reels, pipeline } = state;
+  const { metrics, reels, pipeline } = state;
 
   const [countdown, setCountdown] = useState(() =>
     formatCountdown('2026-11-27T00:00:00')
@@ -91,9 +91,7 @@ export const DashboardTab: React.FC = () => {
 
   // Pacing against Release Week targets (120 7d streams / 50 7d listeners)
   const current7dStreams = Math.min(120, Math.round(metrics.allTimeStreams * 0.08));
-  const current7dListeners = organicMode
-    ? metrics.monthlyListeners
-    : metrics.monthlyListenersRaw;
+  const current7dListeners = metrics.monthlyListeners;
   const streamPct = Math.min(100, Math.round((current7dStreams / 120) * 100));
   const listenerPct = Math.min(100, Math.round((current7dListeners / 50) * 100));
   const overallPacePct = Math.round((streamPct + listenerPct) / 2);
@@ -103,13 +101,6 @@ export const DashboardTab: React.FC = () => {
   const listenerStatus = getPaceStatus(listenerPct);
 
   const portfolioPct = metrics.overallPortfolioProgress;
-
-  const displayedListeners = organicMode
-    ? metrics.monthlyListeners
-    : metrics.monthlyListenersRaw;
-  const displayedIg = organicMode
-    ? metrics.instagramOrganicFollowers
-    : metrics.instagramFollowers;
 
   return (
     <div className="space-y-4 pb-4">
@@ -250,7 +241,7 @@ export const DashboardTab: React.FC = () => {
           </div>
           <div className="mt-2">
             <div className="text-3xl font-bold tracking-tight text-[#E3E2E6]">
-              {displayedListeners.toLocaleString()}
+              {metrics.monthlyListeners.toLocaleString()}
             </div>
             <div className="mt-0.5 text-[11px] text-zinc-500">
               {metrics.spotifyFollowers} followers
@@ -308,12 +299,9 @@ export const DashboardTab: React.FC = () => {
             <div className="text-xs font-medium text-zinc-400">
               All-Time Streams
             </div>
-            <div className="mt-1 flex items-baseline gap-2">
+            <div className="mt-1">
               <span className="text-2xl font-bold tracking-tight text-[#E3E2E6]">
                 {metrics.allTimeStreams.toLocaleString()}
-              </span>
-              <span className="text-xs text-zinc-500">
-                {metrics.weeklyOrganicStreams}
               </span>
             </div>
           </div>
@@ -342,12 +330,9 @@ export const DashboardTab: React.FC = () => {
             <div className="text-xs font-medium text-zinc-400">
               Instagram Followers
             </div>
-            <div className="mt-1 flex items-baseline gap-2">
+            <div className="mt-1">
               <span className="text-2xl font-bold tracking-tight text-[#E3E2E6]">
-                {displayedIg.toLocaleString()}
-              </span>
-              <span className="text-xs text-zinc-500">
-                {organicMode ? 'Organic' : 'Total'}
+                {metrics.instagramFollowers.toLocaleString()}
               </span>
             </div>
           </div>

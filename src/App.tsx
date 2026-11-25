@@ -9,8 +9,6 @@ import {
   Wifi,
   WifiOff,
   HardDrive,
-  Flame,
-  Sparkles,
 } from 'lucide-react';
 import { LxgProvider, useLxg } from './context/LxgContext';
 import DashboardTab from './components/DashboardTab';
@@ -87,9 +85,6 @@ function SyncStatusPill() {
 
 function CommandShell() {
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
-  const { state, toggleOrganicMode } = useLxg();
-
-  const isOrganic = state.organicMode;
 
   return (
     <div className="min-h-screen w-full bg-[#111318] text-[#E3E2E6] flex justify-center">
@@ -110,44 +105,6 @@ function CommandShell() {
 
             <div className="flex items-center gap-2">
               <SyncStatusPill />
-            </div>
-          </div>
-
-          {/* Organic vs. Raw Spike Pill Switch */}
-          <div className="mt-3 flex items-center">
-            <div
-              role="group"
-              aria-label="Growth view mode"
-              className="inline-flex w-full rounded-full bg-[#1B1E24] p-1"
-            >
-              <button
-                type="button"
-                onClick={() => {
-                  if (!isOrganic) toggleOrganicMode();
-                }}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
-                  isOrganic
-                    ? 'bg-[#2A313D] text-[#6DD58C] shadow-sm'
-                    : 'text-zinc-400 hover:text-zinc-200'
-                }`}
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>Organic</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (isOrganic) toggleOrganicMode();
-                }}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
-                  !isOrganic
-                    ? 'bg-[#2A313D] text-[#F2B8B5] shadow-sm'
-                    : 'text-zinc-400 hover:text-zinc-200'
-                }`}
-              >
-                <Flame className="h-3.5 w-3.5" />
-                <span>Raw Spike</span>
-              </button>
             </div>
           </div>
         </header>

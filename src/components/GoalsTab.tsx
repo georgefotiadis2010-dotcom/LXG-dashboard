@@ -14,7 +14,7 @@ const GOAL_ROWS: GoalRowConfig[] = [
   {
     key: 'monthlyListeners',
     label: 'Monthly Spotify Listeners',
-    subtitle: 'Adjusted organic vs. 2027 / A&R threshold',
+    subtitle: 'Current listeners vs. 2027 / A&R threshold',
   },
   {
     key: 'allTimeStreams',
