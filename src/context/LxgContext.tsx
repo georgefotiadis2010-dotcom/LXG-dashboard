@@ -255,8 +255,8 @@ export const INITIAL_STATE: LxgState = {
   ],
   reels: INITIAL_REELS,
   syncSettings: {
-    webAppUrl: '',
-    secretKey: '',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbyk_G6mF_PbZkrrr7koOLor0L9PofmqFm1QRAtWC0717DXkfKzABXgGI9eNIVZHvk6L/exec',
+    secretKey: 'lxg-2026-secret',
     autoSync: false,
     lastSyncedAt: null,
   },
