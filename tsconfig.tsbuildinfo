@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/accounttab.tsx","./src/components/calendartab.tsx","./src/components/contenttab.tsx","./src/components/dashboardtab.tsx","./src/components/goalstab.tsx","./src/context/lxgcontext.tsx","./src/lib/sheetsync.ts","./src/types/lxg.ts"],"version":"5.9.3"}

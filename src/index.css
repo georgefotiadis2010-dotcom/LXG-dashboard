@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-obsidian: #09090B;
+    --bg-card: #121216;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --accent-crimson: #DC2626;
+    --accent-crimson-bright: #EF4444;
+  }
+
+  html,
+  body {
+    background-color: #09090B;
+    color: #F4F4F5;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overscroll-behavior-y: contain;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Dark Y2K / grunge studio card & scrollbar utilities */
+.studio-card {
+  background-color: #121216;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
