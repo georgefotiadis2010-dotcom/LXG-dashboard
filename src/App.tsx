@@ -92,41 +92,42 @@ function CommandShell() {
   const isOrganic = state.organicMode;
 
   return (
-    <div className="min-h-screen w-full bg-[#09090B] text-zinc-100 flex justify-center">
-      <div className="relative flex min-h-screen w-full max-w-[430px] flex-col bg-[#09090B] sm:border-x sm:border-white/[0.08]">
-        {/* Top Status Header */}
-        <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#09090B]/90 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2.5 backdrop-blur-md">
+    <div className="min-h-screen w-full bg-[#111318] text-[#E3E2E6] flex justify-center">
+      <div className="relative flex min-h-screen w-full max-w-[430px] flex-col bg-[#111318]">
+        {/* Top Minimal Material Header */}
+        <header className="sticky top-0 z-30 bg-[#111318]/90 px-5 pt-[max(0.875rem,env(safe-area-inset-top))] pb-3 backdrop-blur-xl">
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-2 w-2 rounded-full bg-[#DC2626] shadow-[0_0_8px_#EF4444]" />
-                <h1 className="truncate text-sm font-black tracking-tight text-white">
-                  LXG <span className="font-semibold text-zinc-400">(@officiallxgmusic)</span>
+                <h1 className="truncate text-lg font-bold tracking-tight text-[#E3E2E6]">
+                  LXG
                 </h1>
+                <span className="rounded-full bg-[#1B1E24] px-2.5 py-0.5 text-[11px] font-medium text-zinc-400">
+                  @officiallxgmusic
+                </span>
               </div>
-              <p className="mt-0.5 text-[10px] font-medium uppercase tracking-widest text-zinc-500">
-                Pop Rap · Melbourne, AU
-              </p>
             </div>
 
-            <SyncStatusPill />
+            <div className="flex items-center gap-2">
+              <SyncStatusPill />
+            </div>
           </div>
 
-          {/* Organic vs. Raw Spike Toggle Pill */}
-          <div className="mt-2.5 flex items-center justify-between gap-2">
+          {/* Organic vs. Raw Spike Pill Switch */}
+          <div className="mt-3 flex items-center">
             <div
               role="group"
               aria-label="Growth view mode"
-              className="inline-flex w-full rounded-lg border border-white/[0.08] bg-[#121216] p-0.5"
+              className="inline-flex w-full rounded-full bg-[#1B1E24] p-1"
             >
               <button
                 type="button"
                 onClick={() => {
                   if (!isOrganic) toggleOrganicMode();
                 }}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition ${
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
                   isOrganic
-                    ? 'bg-[#DC2626] text-white shadow-[0_0_12px_rgba(220,38,38,0.35)]'
+                    ? 'bg-[#2A313D] text-[#6DD58C] shadow-sm'
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
@@ -138,9 +139,9 @@ function CommandShell() {
                 onClick={() => {
                   if (isOrganic) toggleOrganicMode();
                 }}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition ${
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
                   !isOrganic
-                    ? 'bg-[#DC2626] text-white shadow-[0_0_12px_rgba(220,38,38,0.35)]'
+                    ? 'bg-[#2A313D] text-[#F2B8B5] shadow-sm'
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
@@ -152,7 +153,7 @@ function CommandShell() {
         </header>
 
         {/* Main Scrollable Content */}
-        <main className="flex-1 overflow-y-auto px-4 pt-4 pb-24">
+        <main className="flex-1 overflow-y-auto px-4 pt-2 pb-28">
           {activeTab === 'dashboard' && <DashboardTab />}
           {activeTab === 'goals' && <GoalsTab />}
           {activeTab === 'content' && <ContentTab />}
@@ -160,10 +161,10 @@ function CommandShell() {
           {activeTab === 'account' && <AccountTab />}
         </main>
 
-        {/* Fixed Bottom Navigation Bar */}
+        {/* Material 3 Bottom Navigation Bar */}
         <nav
           aria-label="Primary navigation"
-          className="fixed bottom-0 z-30 w-full max-w-[430px] border-t border-white/[0.08] bg-[#09090B]/95 px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md"
+          className="fixed bottom-0 z-30 w-full max-w-[430px] bg-[#16181E]/95 px-3 pt-2 pb-[max(0.65rem,env(safe-area-inset-bottom))] backdrop-blur-xl"
         >
           <div className="grid grid-cols-5 gap-1">
             {TABS.map(({ id, label, icon: Icon }) => {
@@ -173,18 +174,24 @@ function CommandShell() {
                   key={id}
                   type="button"
                   onClick={() => setActiveTab(id)}
-                  className={`flex flex-col items-center justify-center gap-1 rounded-lg py-1.5 text-[10px] font-semibold transition ${
-                    active
-                      ? 'text-[#EF4444]'
-                      : 'text-zinc-500 hover:text-zinc-300'
-                  }`}
+                  className="group flex flex-col items-center justify-center gap-1 py-1 text-[11px] font-medium transition-all"
                 >
-                  <Icon
-                    className={`h-5 w-5 transition ${
-                      active ? 'text-[#EF4444] drop-shadow-[0_0_6px_rgba(239,68,68,0.5)]' : ''
+                  <div
+                    className={`flex h-8 w-14 items-center justify-center rounded-full transition-all duration-200 ${
+                      active
+                        ? 'bg-[#2A313D] text-[#E3E2E6]'
+                        : 'text-zinc-500 group-hover:text-zinc-300'
                     }`}
-                  />
-                  <span>{label}</span>
+                  >
+                    <Icon className="h-[18px] w-[18px]" />
+                  </div>
+                  <span
+                    className={`transition-colors ${
+                      active ? 'font-semibold text-[#E3E2E6]' : 'text-zinc-500'
+                    }`}
+                  >
+                    {label}
+                  </span>
                 </button>
               );
             })}
