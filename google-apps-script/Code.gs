@@ -224,7 +224,8 @@ function readMonthlyListenerGoals_(ss) {
 
     if (ymKey) {
       goals[ymKey] = val;
-    } else if (shortKey) {
+    }
+    if (shortKey && !goals[shortKey]) {
       goals[shortKey] = val;
     }
   }

@@ -462,6 +462,7 @@ export const LxgProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       if (data.state) {
+        console.log('[LXG Sync] monthlyListenerGoal:', data.state.monthlyListenerGoal, 'monthlyListenerGoals:', data.state.monthlyListenerGoals);
         setState((prev) => ({
           ...prev,
           metrics: {

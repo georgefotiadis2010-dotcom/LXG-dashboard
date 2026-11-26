@@ -226,6 +226,8 @@ export const DashboardTab: React.FC = () => {
     return { label, goal, fillPct, isCompleted, isCurrent };
   });
 
+  console.log('[LXG Dashboard] monthlyListenerGoals:', state.monthlyListenerGoals, 'monthSegments:', monthSegments);
+
   const listenerTrend = getPaceTrend(
     metrics.monthlyListeners,
     monthlyGoal,
