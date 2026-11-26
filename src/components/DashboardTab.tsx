@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   ArrowDown,
   ArrowRight,
   ArrowUp,
+  Check,
   Clapperboard,
   Disc3,
   Eye,
   Flame,
   Headphones,
   Instagram,
+  Pencil,
   Percent,
+  Sparkles,
   Users,
+  X,
 } from 'lucide-react';
 import { METRIC_TARGETS, useLxg } from '../context/LxgContext';
 
@@ -97,8 +101,69 @@ const MetricTile: React.FC<MetricCardItem> = ({ label, value, trend, Icon }) => 
 );
 
 export const DashboardTab: React.FC = () => {
-  const { state } = useLxg();
+  const { state, updateMetrics } = useLxg();
   const { metrics, reels } = state;
+  const [spotifyDrawerOpen, setSpotifyDrawerOpen] = useState(false);
+  const [draftSpotify, setDraftSpotify] = useState({
+    monthlyListeners: String(metrics.monthlyListeners),
+    allTimeStreams: String(metrics.allTimeStreams),
+    topSingleStreams: String(metrics.topSingleStreams),
+    catalogReleases: String(metrics.catalogReleases),
+  });
+
+  const openSpotifyDrawer = () => {
+    setDraftSpotify({
+      monthlyListeners: String(metrics.monthlyListeners),
+      allTimeStreams: String(metrics.allTimeStreams),
+      topSingleStreams: String(metrics.topSingleStreams),
+      catalogReleases: String(metrics.catalogReleases),
+    });
+    setSpotifyDrawerOpen(true);
+  };
+
+  const saveSpotifyDrawer = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateMetrics({
+      monthlyListeners: Math.max(0, Number(draftSpotify.monthlyListeners) || 0),
+      allTimeStreams: Math.max(0, Number(draftSpotify.allTimeStreams) || 0),
+      topSingleStreams: Math.max(0, Number(draftSpotify.topSingleStreams) || 0),
+      catalogReleases: Math.max(0, Number(draftSpotify.catalogReleases) || 0),
+    });
+    setSpotifyDrawerOpen(false);
+  };
+
+  const whatsWorking = useMemo(() => {
+    if (!reels.length) return null;
+    const byEngagement = [...reels].sort(
+      (a, b) => b.engagementRate - a.engagementRate || b.views - a.views
+    );
+    const topReel = byEngagement[0];
+
+    const formatTotals = new Map<string, { sum: number; count: number }>();
+    for (const r of reels) {
+      const prev = formatTotals.get(r.visualFormat) ?? { sum: 0, count: 0 };
+      formatTotals.set(r.visualFormat, {
+        sum: prev.sum + r.engagementRate,
+        count: prev.count + 1,
+      });
+    }
+    let topFormat = topReel.visualFormat;
+    let bestAvg = -1;
+    for (const [fmt, { sum, count }] of formatTotals.entries()) {
+      const avg = sum / count;
+      if (avg > bestAvg) {
+        bestAvg = avg;
+        topFormat = fmt;
+      }
+    }
+
+    return {
+      topHook: topReel.hook,
+      topEngagement: topReel.engagementRate,
+      topFormat,
+      topTrack: topReel.track,
+    };
+  }, [reels]);
 
   const now = new Date();
   const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -120,19 +185,50 @@ export const DashboardTab: React.FC = () => {
         )
       : 0;
 
+  const monthlyGoal =
+    state.monthlyListenerGoal && state.monthlyListenerGoal > 0
+      ? state.monthlyListenerGoal
+      : MONTHLY_LISTENER_GOAL;
+
   const ultimateGoal = METRIC_TARGETS.monthlyListeners.labelReadyRadar;
-  const monthlyPct = Math.min(
-    100,
-    Math.round((metrics.monthlyListeners / MONTHLY_LISTENER_GOAL) * 100)
-  );
-  const ultimatePct = Math.min(
-    100,
-    (metrics.monthlyListeners / ultimateGoal) * 100
-  );
+
+  const formatCompactGoal = (val: number) => {
+    if (val >= 1000) {
+      const k = val / 1000;
+      return `${Number.isInteger(k) ? k : k.toFixed(1)}k`;
+    }
+    return val.toLocaleString();
+  };
+
+  const monthSegments = Array.from({ length: 6 }, (_, i) => {
+    const segDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const label = segDate.toLocaleDateString('en-US', { month: 'short' });
+    const monthKey = `${segDate.getFullYear()}-${String(segDate.getMonth() + 1).padStart(2, '0')}`;
+    const sheetGoal =
+      state.monthlyListenerGoals?.[monthKey] ??
+      state.monthlyListenerGoals?.[label] ??
+      state.monthlyListenerGoals?.[label.toLowerCase()];
+    const t = i / 5;
+    const rawGoal = monthlyGoal + (ultimateGoal - monthlyGoal) * t;
+    const fallbackGoal =
+      i === 0
+        ? monthlyGoal
+        : i === 5
+          ? ultimateGoal
+          : Math.round(rawGoal / 500) * 500;
+    const goal =
+      typeof sheetGoal === 'number' && sheetGoal > 0 ? sheetGoal : fallbackGoal;
+    const fillPct =
+      goal > 0 ? Math.min(100, Math.round((metrics.monthlyListeners / goal) * 100)) : 0;
+    const isCompleted = metrics.monthlyListeners >= goal;
+    const isCurrent = i === 0;
+
+    return { label, goal, fillPct, isCompleted, isCurrent };
+  });
 
   const listenerTrend = getPaceTrend(
     metrics.monthlyListeners,
-    MONTHLY_LISTENER_GOAL,
+    monthlyGoal,
     monthProgress
   );
 
@@ -197,45 +293,54 @@ export const DashboardTab: React.FC = () => {
             <TrendArrow trend={listenerTrend} />
           </div>
 
-          <div className="mt-7 space-y-3.5 border-t border-white/5 pt-6 text-left">
-            {/* Monthly Goal */}
-            <div>
-              <div className="mb-1.5 flex items-center justify-between text-[11px]">
-                <span className="font-medium text-zinc-400">Monthly Goal</span>
-                <span className="font-semibold text-[#E3E2E6] tabular-nums">
-                  {metrics.monthlyListeners.toLocaleString()} /{' '}
-                  {MONTHLY_LISTENER_GOAL.toLocaleString()}
-                </span>
-              </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#111318]">
-                <div
-                  className="h-full rounded-full bg-[#6DD58C] transition-all duration-500"
-                  style={{ width: `${monthlyPct}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Ultimate Goal */}
-            <div>
-              <div className="mb-1.5 flex items-center justify-between text-[11px]">
-                <span className="font-medium text-zinc-400">Ultimate Goal</span>
-                <span className="font-semibold text-zinc-300 tabular-nums">
-                  {metrics.monthlyListeners.toLocaleString()} /{' '}
-                  {(ultimateGoal / 1000).toLocaleString()}k
-                </span>
-              </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#111318]">
-                <div
-                  className="h-full rounded-full bg-[#A8C7FA] transition-all duration-500"
-                  style={{
-                    width: `${
-                      metrics.monthlyListeners > 0
-                        ? Math.max(2, ultimatePct)
-                        : 0
-                    }%`,
-                  }}
-                />
-              </div>
+          <div className="mt-7 border-t border-white/5 pt-6">
+            <div className="grid grid-cols-6 gap-2">
+              {monthSegments.map((seg) => (
+                <div key={seg.label} className="flex flex-col items-center gap-2">
+                  <div
+                    className={`relative flex h-20 w-full items-center justify-center overflow-hidden rounded-2xl bg-[#111318] transition-all duration-500 ${
+                      seg.isCompleted
+                        ? 'ring-1 ring-[#6DD58C]/40 shadow-[0_0_16px_rgba(109,213,140,0.22)]'
+                        : seg.isCurrent
+                          ? 'ring-1 ring-white/10 shadow-[0_0_14px_rgba(168,199,250,0.12)]'
+                          : 'ring-1 ring-white/[0.04]'
+                    }`}
+                  >
+                    <div
+                      className={`absolute inset-x-0 bottom-0 transition-all duration-700 ease-out ${
+                        seg.isCompleted
+                          ? 'bg-[#6DD58C]/30'
+                          : seg.isCurrent
+                            ? 'bg-gradient-to-t from-[#6DD58C]/35 to-[#6DD58C]/10'
+                            : 'bg-[#A8C7FA]/15'
+                      }`}
+                      style={{ height: `${seg.fillPct}%` }}
+                    />
+                    <span
+                      className={`relative z-10 text-[10px] font-semibold tracking-tight tabular-nums transition-colors duration-300 ${
+                        seg.isCompleted
+                          ? 'text-[#6DD58C]'
+                          : seg.isCurrent
+                            ? 'text-[#E3E2E6]'
+                            : 'text-zinc-500'
+                      }`}
+                    >
+                      {formatCompactGoal(seg.goal)}
+                    </span>
+                  </div>
+                  <span
+                    className={`text-[10px] font-medium tracking-wider uppercase transition-colors duration-300 ${
+                      seg.isCompleted
+                        ? 'text-[#6DD58C]'
+                        : seg.isCurrent
+                          ? 'text-[#E3E2E6]'
+                          : 'text-zinc-600'
+                    }`}
+                  >
+                    {seg.label}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -276,9 +381,14 @@ export const DashboardTab: React.FC = () => {
                 Spotify
               </span>
             </div>
-            <span className="text-[10px] font-medium text-zinc-500">
-              Streaming
-            </span>
+            <button
+              type="button"
+              onClick={openSpotifyDrawer}
+              className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2.5 py-1 text-[10px] font-medium text-zinc-300 transition hover:bg-white/10 active:scale-95"
+            >
+              <Pencil className="h-2.5 w-2.5 text-[#6DD58C]" />
+              <span>Update</span>
+            </button>
           </div>
           <div className="grid grid-cols-3 gap-2.5">
             {spotifyMetrics.map((item) => (
@@ -286,7 +396,138 @@ export const DashboardTab: React.FC = () => {
             ))}
           </div>
         </div>
+
+        {/* Auto-Computed "What's Working" Insights */}
+        {whatsWorking && (
+          <div className="rounded-[28px] bg-[#1B1E24] p-5">
+            <div className="mb-3.5 flex items-center justify-between">
+              <div className="inline-flex items-center gap-2">
+                <Sparkles className="h-3.5 w-3.5 text-[#A8C7FA]" />
+                <span className="text-[11px] font-semibold tracking-[0.14em] text-zinc-300 uppercase">
+                  What&apos;s Working
+                </span>
+              </div>
+              <span className="text-[10px] font-medium text-zinc-500">
+                Auto-ranked
+              </span>
+            </div>
+            <div className="space-y-2.5 text-xs">
+              <div className="flex items-center justify-between gap-3 rounded-2xl bg-[#111318]/70 px-3.5 py-2.5">
+                <span className="text-zinc-400">Top Hook</span>
+                <span className="truncate font-medium text-[#E3E2E6]">
+                  &ldquo;{whatsWorking.topHook}&rdquo;
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3 rounded-2xl bg-[#111318]/70 px-3.5 py-2.5">
+                <span className="text-zinc-400">Best Format</span>
+                <span className="truncate font-medium text-[#A8C7FA]">
+                  {whatsWorking.topFormat}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3 rounded-2xl bg-[#111318]/70 px-3.5 py-2.5">
+                <span className="text-zinc-400">Top Track</span>
+                <span className="font-medium text-[#6DD58C]">
+                  {whatsWorking.topTrack} ({whatsWorking.topEngagement.toFixed(1)}% ER)
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
+
+      {/* One-Tap Spotify Quick Update Drawer */}
+      {spotifyDrawerOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm"
+          onClick={() => setSpotifyDrawerOpen(false)}
+        >
+          <form
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={saveSpotifyDrawer}
+            className="w-full max-w-[430px] rounded-t-[28px] border-t border-white/10 bg-[#1B1E24] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <div className="inline-flex items-center gap-2">
+                <Disc3 className="h-4 w-4 text-[#6DD58C]" />
+                <h2 className="text-sm font-semibold text-[#E3E2E6]">
+                  Quick Update Spotify
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSpotifyDrawerOpen(false)}
+                className="rounded-full p-1.5 text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block space-y-1">
+                <span className="text-[11px] text-zinc-400">Monthly Listeners</span>
+                <input
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={draftSpotify.monthlyListeners}
+                  onChange={(e) =>
+                    setDraftSpotify((d) => ({ ...d, monthlyListeners: e.target.value }))
+                  }
+                  className="w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-[#E3E2E6] outline-none focus:border-[#6DD58C]"
+                />
+              </label>
+              <label className="block space-y-1">
+                <span className="text-[11px] text-zinc-400">All-Time Streams</span>
+                <input
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={draftSpotify.allTimeStreams}
+                  onChange={(e) =>
+                    setDraftSpotify((d) => ({ ...d, allTimeStreams: e.target.value }))
+                  }
+                  className="w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-[#E3E2E6] outline-none focus:border-[#6DD58C]"
+                />
+              </label>
+              <label className="block space-y-1">
+                <span className="text-[11px] text-zinc-400">Top Single Streams</span>
+                <input
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={draftSpotify.topSingleStreams}
+                  onChange={(e) =>
+                    setDraftSpotify((d) => ({ ...d, topSingleStreams: e.target.value }))
+                  }
+                  className="w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-[#E3E2E6] outline-none focus:border-[#6DD58C]"
+                />
+              </label>
+              <label className="block space-y-1">
+                <span className="text-[11px] text-zinc-400">Catalog Releases</span>
+                <input
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={draftSpotify.catalogReleases}
+                  onChange={(e) =>
+                    setDraftSpotify((d) => ({ ...d, catalogReleases: e.target.value }))
+                  }
+                  className="w-full rounded-xl border border-white/10 bg-[#111318] px-3 py-2 text-sm text-[#E3E2E6] outline-none focus:border-[#6DD58C]"
+                />
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-2xl bg-[#6DD58C] px-4 py-2.5 text-xs font-semibold text-[#0B120D] transition active:scale-[0.99]"
+            >
+              <Check className="h-3.5 w-3.5" />
+              <span>Save Spotify Stats</span>
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

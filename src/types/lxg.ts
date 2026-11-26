@@ -79,6 +79,8 @@ export interface LxgState {
   horizonDate: string;
   schoolMode: boolean;
   metrics: LxgMetrics;
+  monthlyListenerGoal?: number;
+  monthlyListenerGoals?: Record<string, number>;
   pipeline: ReleasePipelineItem[];
   checklist: ChecklistItem[];
   reels: ReelEntry[];

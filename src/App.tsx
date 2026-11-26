@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   LayoutDashboard,
   Target,
   Clapperboard,
-  CalendarDays,
   RefreshCw,
   Wifi,
   WifiOff,
@@ -13,19 +12,35 @@ import { LxgProvider, useLxg } from './context/LxgContext';
 import DashboardTab from './components/DashboardTab';
 import GoalsTab from './components/GoalsTab';
 import { ContentTab } from './components/ContentTab';
-import { CalendarTab } from './components/CalendarTab';
 
-type TabId = 'dashboard' | 'goals' | 'content' | 'calendar';
+type TabId = 'dashboard' | 'goals' | 'content';
 
 const TABS: { id: TabId; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'goals', label: 'Goals', icon: Target },
   { id: 'content', label: 'Content', icon: Clapperboard },
-  { id: 'calendar', label: 'Calendar', icon: CalendarDays },
 ];
 
+function formatRelativeTime(iso: string | null): string | null {
+  if (!iso) return null;
+  const diffSec = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+  if (diffSec < 60) return 'just now';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  return `${Math.floor(diffHr / 24)}d ago`;
+}
+
 function SyncStatusPill() {
-  const { syncStatus, syncNow } = useLxg();
+  const { state, syncStatus, syncNow } = useLxg();
+  const lastSyncedAt = state.syncSettings.lastSyncedAt;
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setTick((t) => t + 1), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
 
   const statusConfig = {
     success: {
@@ -63,16 +78,17 @@ function SyncStatusPill() {
   }[syncStatus];
 
   const { label, dot, text, border, bg } = statusConfig;
+  const relTime = syncStatus === 'success' ? formatRelativeTime(lastSyncedAt) : null;
 
   return (
     <button
       type="button"
       onClick={() => syncNow?.()}
-      title="Sync Now"
+      title={lastSyncedAt ? `Last synced: ${new Date(lastSyncedAt).toLocaleTimeString()}` : 'Sync Now'}
       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition active:scale-95 ${bg} ${border} ${text}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
-      <span>{label}</span>
+      <span>{relTime ? `${label} · ${relTime}` : label}</span>
       <RefreshCw
         className={`h-3 w-3 opacity-75 ${syncStatus === 'syncing' ? 'animate-spin' : ''}`}
       />
@@ -111,7 +127,6 @@ function CommandShell() {
           {activeTab === 'dashboard' && <DashboardTab />}
           {activeTab === 'goals' && <GoalsTab />}
           {activeTab === 'content' && <ContentTab />}
-          {activeTab === 'calendar' && <CalendarTab />}
         </main>
 
         {/* Material 3 Bottom Navigation Bar */}
@@ -119,7 +134,7 @@ function CommandShell() {
           aria-label="Primary navigation"
           className="fixed bottom-0 z-30 w-full max-w-[430px] bg-[#16181E]/95 px-3 pt-2 pb-[max(0.65rem,env(safe-area-inset-bottom))] backdrop-blur-xl"
         >
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-3 gap-1">
             {TABS.map(({ id, label, icon: Icon }) => {
               const active = activeTab === id;
               return (

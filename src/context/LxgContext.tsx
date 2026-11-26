@@ -250,7 +250,7 @@ export const INITIAL_STATE: LxgState = {
   ],
   reels: INITIAL_REELS,
   syncSettings: {
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbyk_G6mF_PbZkrrr7koOLor0L9PofmqFm1QRAtWC0717DXkfKzABXgGI9eNIVZHvk6L/exec',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycby1XWa4HteR36VUwHscG2KlrB-FFnVTpDxmrlwB7oT7PchVKii2JWhr0LPqWvX6mlpT/exec',
     secretKey: 'lxg-2026-secret',
     autoSync: false,
     lastSyncedAt: null,
@@ -273,6 +273,10 @@ function loadInitialState(): LxgState {
       syncSettings: {
         ...INITIAL_STATE.syncSettings,
         ...(parsed.syncSettings ?? {}),
+        webAppUrl:
+          parsed.syncSettings?.webAppUrl?.includes('AKfycbyk_G6mF_PbZkrrr7koOLor0L9PofmqFm1QRAtWC0717DXkfKzABXgGI9eNIVZHvk6L')
+            ? INITIAL_STATE.syncSettings.webAppUrl
+            : (parsed.syncSettings?.webAppUrl ?? INITIAL_STATE.syncSettings.webAppUrl),
       },
       pipeline: Array.isArray(parsed.pipeline) ? parsed.pipeline : INITIAL_STATE.pipeline,
       checklist: Array.isArray(parsed.checklist) ? parsed.checklist : INITIAL_STATE.checklist,
@@ -464,6 +468,15 @@ export const LxgProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ...prev.metrics,
             ...(data.state?.metrics ?? {}),
           },
+          monthlyListenerGoal:
+            typeof data.state?.monthlyListenerGoal === 'number'
+              ? data.state.monthlyListenerGoal
+              : prev.monthlyListenerGoal,
+          monthlyListenerGoals:
+            data.state?.monthlyListenerGoals &&
+            typeof data.state.monthlyListenerGoals === 'object'
+              ? data.state.monthlyListenerGoals
+              : prev.monthlyListenerGoals,
           checklist: Array.isArray(data.state?.checklist)
             ? data.state.checklist
             : prev.checklist,

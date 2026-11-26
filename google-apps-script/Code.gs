@@ -102,11 +102,133 @@ function readFullState_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   return {
     metrics: readMetrics_(ss),
+    monthlyListenerGoal: readMonthlyListenerGoal_(ss),
+    monthlyListenerGoals: readMonthlyListenerGoals_(ss),
     reels: readReels_(ss),
     weeklyLog: readWeeklyLog_(ss),
     checklist: readChecklist_(ss),
     syncedAt: new Date().toISOString(),
   };
+}
+
+/**
+ * Reads this month's Target Monthly Listeners from the "Monthly Goals" sheet.
+ * Layout: Months in Column B (e.g. "Nov 2026"), Target Monthly in Column C.
+ */
+function readMonthlyListenerGoal_(ss) {
+  const sheet =
+    ss.getSheets().find((s) => s.getName().trim().toLowerCase().indexOf('monthly goals') !== -1) ||
+    null;
+  if (!sheet) return null;
+
+  const data = sheet.getDataRange().getValues();
+  if (data.length < 2) return null;
+
+  const now = new Date();
+  const tz = ss.getSpreadsheetTimeZone();
+  const shortMonthYear = Utilities.formatDate(now, tz, 'MMM yyyy').toLowerCase(); // e.g. "nov 2026"
+  const fullMonthYear = Utilities.formatDate(now, tz, 'MMMM yyyy').toLowerCase(); // e.g. "november 2026"
+  const ym = Utilities.formatDate(now, tz, 'yyyy-MM'); // e.g. "2026-11"
+
+  // Find "Target Monthly" column from header row (usually Col C / index 2)
+  let targetCol = 2;
+  for (let r = 0; r < Math.min(10, data.length); r++) {
+    const idx = data[r].findIndex(
+      (h) => String(h || '').trim().toLowerCase().indexOf('target monthly') !== -1
+    );
+    if (idx !== -1) {
+      targetCol = idx;
+      break;
+    }
+  }
+
+  for (let r = 0; r < data.length; r++) {
+    const rawMonth = data[r][1] || data[r][0];
+    if (!rawMonth) continue;
+
+    let monthStr = '';
+    if (rawMonth instanceof Date) {
+      monthStr = Utilities.formatDate(rawMonth, tz, 'MMM yyyy').toLowerCase();
+    } else {
+      monthStr = String(rawMonth).trim().toLowerCase();
+    }
+
+    if (
+      monthStr === shortMonthYear ||
+      monthStr === fullMonthYear ||
+      monthStr === ym ||
+      monthStr.indexOf(shortMonthYear) !== -1
+    ) {
+      const val = Number(data[r][targetCol]);
+      if (!isNaN(val) && val > 0) return val;
+    }
+  }
+  return null;
+}
+
+/**
+ * Reads all monthly Target Monthly Listeners from the "Monthly Goals" sheet
+ * as a map keyed by "yyyy-MM" (e.g. { "2026-11": 500, "2026-12": 1000 }).
+ */
+function readMonthlyListenerGoals_(ss) {
+  const sheet =
+    ss.getSheets().find((s) => s.getName().trim().toLowerCase().indexOf('monthly goals') !== -1) ||
+    null;
+  if (!sheet) return {};
+
+  const data = sheet.getDataRange().getValues();
+  if (data.length < 2) return {};
+
+  const tz = ss.getSpreadsheetTimeZone();
+  let targetCol = 2;
+  for (let r = 0; r < Math.min(10, data.length); r++) {
+    const idx = data[r].findIndex(
+      (h) => String(h || '').trim().toLowerCase().indexOf('target monthly') !== -1
+    );
+    if (idx !== -1) {
+      targetCol = idx;
+      break;
+    }
+  }
+
+  const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  const goals = {};
+  for (let r = 0; r < data.length; r++) {
+    const rawMonth = data[r][1] || data[r][0];
+    if (!rawMonth) continue;
+
+    const val = Number(data[r][targetCol]);
+    if (isNaN(val) || val <= 0) continue;
+
+    let ymKey = '';
+    let shortKey = '';
+    if (rawMonth instanceof Date) {
+      ymKey = Utilities.formatDate(rawMonth, tz, 'yyyy-MM');
+      shortKey = Utilities.formatDate(rawMonth, tz, 'MMM').toLowerCase();
+    } else {
+      const str = String(rawMonth).trim().toLowerCase();
+      const ymMatch = str.match(/^(\d{4})-(\d{1,2})/);
+      if (ymMatch) {
+        ymKey = ymMatch[1] + '-' + ('0' + ymMatch[2]).slice(-2);
+      } else {
+        const mIdx = monthNames.findIndex((m) => str.indexOf(m) !== -1);
+        if (mIdx !== -1) {
+          shortKey = monthNames[mIdx];
+          const yMatch = str.match(/(\d{4})/);
+          if (yMatch) {
+            ymKey = yMatch[1] + '-' + ('0' + (mIdx + 1)).slice(-2);
+          }
+        }
+      }
+    }
+
+    if (ymKey) {
+      goals[ymKey] = val;
+    } else if (shortKey) {
+      goals[shortKey] = val;
+    }
+  }
+  return goals;
 }
 
 /**
