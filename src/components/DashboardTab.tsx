@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { WaterProgressCanvas } from './WaterProgressCanvas';
 import {
   ArrowDown,
   ArrowRight,
@@ -218,12 +219,21 @@ export const DashboardTab: React.FC = () => {
           : Math.round(rawGoal / 500) * 500;
     const goal =
       typeof sheetGoal === 'number' && sheetGoal > 0 ? sheetGoal : fallbackGoal;
-    const fillPct =
-      goal > 0 ? Math.min(100, Math.round((metrics.monthlyListeners / goal) * 100)) : 0;
+    const ratio = goal > 0 ? metrics.monthlyListeners / goal : 0;
+    const fillPct = Math.min(100, Math.round(ratio * 100));
     const isCompleted = metrics.monthlyListeners >= goal;
     const isCurrent = i === 0;
+    const paceDelta = ratio - monthProgress;
+    const waterStatus: 'neon' | 'ahead' | 'ontrack' | 'below' =
+      ratio >= 1.25 || (isCurrent && paceDelta >= 0.35)
+        ? 'neon'
+        : isCompleted || paceDelta >= 0.1
+          ? 'ahead'
+          : paceDelta >= -0.1
+            ? 'ontrack'
+            : 'below';
 
-    return { label, goal, fillPct, isCompleted, isCurrent };
+    return { label, goal, fillPct, isCompleted, isCurrent, waterStatus };
   });
 
   console.log('[LXG Dashboard] monthlyListenerGoals:', state.monthlyListenerGoals, 'monthSegments:', monthSegments);
@@ -285,63 +295,78 @@ export const DashboardTab: React.FC = () => {
   return (
     <div className="pb-6">
       {/* Centered Hero: Monthly Listeners + Goal Progress */}
-      <section className="flex min-h-[calc(100dvh-10.5rem)] flex-col items-center justify-center px-2">
-        <div className="w-full max-w-[320px] rounded-[28px] bg-[#1B1E24] px-7 py-9 text-center">
-          <div className="text-7xl font-bold tracking-tight text-[#E3E2E6] tabular-nums">
+      <section className="flex min-h-[calc(100dvh-10.5rem)] w-full flex-col items-center justify-center">
+        <div className="w-full px-3 sm:px-6 text-center">
+          <div className="text-8xl sm:text-9xl font-bold tracking-tighter text-[#E3E2E6] tabular-nums">
             {metrics.monthlyListeners.toLocaleString()}
           </div>
-          <div className="mt-1.5 inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold tracking-[0.18em] text-zinc-400 uppercase">
+          <div className="mt-2 inline-flex items-center justify-center gap-2 text-xs font-semibold tracking-[0.24em] text-zinc-400 uppercase">
             <span>Monthly Listeners</span>
             <TrendArrow trend={listenerTrend} />
           </div>
 
-          <div className="mt-7 border-t border-white/5 pt-6">
-            <div className="grid grid-cols-6 gap-2">
-              {monthSegments.map((seg) => (
-                <div key={seg.label} className="flex flex-col items-center gap-2">
+          <div className="mt-10 w-full">
+            <div className="relative flex h-14 sm:h-16 w-full overflow-hidden rounded-full bg-gradient-to-b from-[#0C0E13] to-[#161922] ring-1 ring-white/[0.08] shadow-[inset_0_4px_10px_rgba(0,0,0,0.85),0_1px_0_rgba(255,255,255,0.08)]">
+              <WaterProgressCanvas
+                fillPct={(() => {
+                  const listeners = metrics.monthlyListeners;
+                  const len = monthSegments.length;
+                  for (let i = 0; i < len; i++) {
+                    const segGoal = monthSegments[i].goal;
+                    const prevGoal = i === 0 ? 0 : monthSegments[i - 1].goal;
+                    if (listeners < segGoal) {
+                      const span = Math.max(1, segGoal - prevGoal);
+                      const progress = Math.max(0, Math.min(1, (listeners - prevGoal) / span));
+                      return ((i + progress) / len) * 100;
+                    }
+                  }
+                  return 100;
+                })()}
+                status={monthSegments[0]?.waterStatus ?? 'ontrack'}
+              />
+              {monthSegments.map((seg, idx) => {
+                const textColor =
+                  seg.fillPct <= 0
+                    ? 'text-zinc-500'
+                    : seg.waterStatus === 'neon'
+                      ? 'text-[#B8FF9E]'
+                      : seg.waterStatus === 'ahead'
+                        ? 'text-[#8CE8A6]'
+                        : seg.waterStatus === 'ontrack'
+                          ? 'text-[#BFDBFE]'
+                          : 'text-[#FECACA]';
+
+                return (
                   <div
-                    className={`relative flex h-20 w-full items-center justify-center overflow-hidden rounded-2xl bg-[#111318] transition-all duration-500 ${
-                      seg.isCompleted
-                        ? 'ring-1 ring-[#6DD58C]/40 shadow-[0_0_16px_rgba(109,213,140,0.22)]'
-                        : seg.isCurrent
-                          ? 'ring-1 ring-white/10 shadow-[0_0_14px_rgba(168,199,250,0.12)]'
-                          : 'ring-1 ring-white/[0.04]'
-                    }`}
+                    key={seg.label}
+                    className="pointer-events-none relative z-10 flex flex-1 items-center justify-center"
                   >
-                    <div
-                      className={`absolute inset-x-0 bottom-0 transition-all duration-700 ease-out ${
-                        seg.isCompleted
-                          ? 'bg-[#6DD58C]/30'
-                          : seg.isCurrent
-                            ? 'bg-gradient-to-t from-[#6DD58C]/35 to-[#6DD58C]/10'
-                            : 'bg-[#A8C7FA]/15'
-                      }`}
-                      style={{ height: `${seg.fillPct}%` }}
-                    />
+                    {idx > 0 && (
+                      <div className="absolute inset-y-2.5 left-0 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+                    )}
                     <span
-                      className={`relative z-10 text-[10px] font-semibold tracking-tight tabular-nums transition-colors duration-300 ${
-                        seg.isCompleted
-                          ? 'text-[#6DD58C]'
-                          : seg.isCurrent
-                            ? 'text-[#E3E2E6]'
-                            : 'text-zinc-500'
-                      }`}
+                      className={`text-xs sm:text-sm font-bold tracking-tight tabular-nums transition-colors duration-300 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] ${textColor}`}
                     >
                       {formatCompactGoal(seg.goal)}
                     </span>
                   </div>
-                  <span
-                    className={`text-[10px] font-medium tracking-wider uppercase transition-colors duration-300 ${
-                      seg.isCompleted
-                        ? 'text-[#6DD58C]'
-                        : seg.isCurrent
-                          ? 'text-[#E3E2E6]'
-                          : 'text-zinc-600'
-                    }`}
-                  >
-                    {seg.label}
-                  </span>
-                </div>
+                );
+              })}
+            </div>
+            <div className="mt-3 grid grid-cols-6">
+              {monthSegments.map((seg) => (
+                <span
+                  key={seg.label}
+                  className={`text-center text-[11px] font-semibold tracking-[0.2em] uppercase transition-colors duration-300 ${
+                    seg.isCompleted
+                      ? 'text-[#6DD58C]'
+                      : seg.isCurrent
+                        ? 'text-[#E3E2E6]'
+                        : 'text-zinc-600'
+                  }`}
+                >
+                  {seg.label}
+                </span>
               ))}
             </div>
           </div>
