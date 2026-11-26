@@ -1,123 +1,107 @@
 import React from 'react';
+import { Calendar, Check, CheckCircle2 } from 'lucide-react';
 import { useLxg } from '../context/LxgContext';
-
-const TIMELINE_MILESTONES = [
-  {
-    id: 'iknow',
-    title: "'I KNOW' Release",
-    date: 'Nov 27, 2026',
-    badge: 'UPCOMING',
-    detail: 'Target: 120 7d streams / 50 7d listeners · Landr Pre-save live',
-  },
-  {
-    id: 'radar',
-    title: 'Release Radar Window',
-    date: 'Dec 4, 2026',
-    badge: 'ALGO',
-    detail: '7-day Spotify algorithmic push window for followers & saves',
-  },
-  {
-    id: 'watch',
-    title: "'WATCH' Waterfall Single",
-    date: 'Jan 2027',
-    badge: 'SCHEDULED',
-    detail: 'Follow-up waterfall release leveraging top-performing studio hook',
-  },
-  {
-    id: 'unearthed',
-    title: 'triple j Unearthed High',
-    date: 'Mar – May 2027',
-    badge: 'TARGET',
-    detail: '3-track portfolio submission window for Australian high schoolers',
-  },
-];
 
 export const CalendarTab: React.FC = () => {
   const { state, toggleChecklistItem } = useLxg();
+  const { pipeline, checklist } = state;
 
-  const completedCount = state.checklist.filter((c) => c.completed).length;
+  const completedCount = checklist.filter((c) => c.completed).length;
 
   return (
-    <div className="space-y-5 pb-6">
-      <div>
-        <h2 className="text-lg font-bold tracking-tight text-white">
-          Release Calendar
-        </h2>
-        <p className="text-xs text-zinc-400">
-          Active execution timeline · Melbourne, AU
-        </p>
+    <div className="mx-auto w-full max-w-[360px] space-y-3 px-2 pb-6 pt-2">
+      <div className="text-center text-[11px] font-semibold tracking-[0.16em] text-zinc-500 uppercase">
+        Release Calendar
       </div>
 
       {/* Release Timeline */}
-      <div className="rounded-xl border border-white/[0.08] bg-[#121216] p-4">
-        <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-zinc-400">
-          2026–2027 Rollout
-        </h3>
-        <div className="relative space-y-4 border-l border-white/10 pl-4">
-          {TIMELINE_MILESTONES.map((item, idx) => (
-            <div key={item.id} className="relative">
-              <span
-                className={`absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full border-2 border-[#121216] ${
-                  idx === 0 ? 'bg-[#EF4444]' : 'bg-zinc-500'
-                }`}
-              />
+      <div className="rounded-[28px] bg-[#1B1E24] p-5">
+        <div className="mb-3.5 flex items-center justify-between">
+          <div className="inline-flex items-center gap-2">
+            <Calendar className="h-3.5 w-3.5 text-[#A8C7FA]" />
+            <span className="text-[11px] font-semibold tracking-[0.14em] text-zinc-300 uppercase">
+              Rollout
+            </span>
+          </div>
+          <span className="text-[10px] font-medium text-zinc-500 tabular-nums">
+            {pipeline.length} milestones
+          </span>
+        </div>
+
+        <div className="space-y-2.5">
+          {pipeline.map((item, idx) => (
+            <div
+              key={item.id}
+              className="rounded-2xl bg-[#14171C]/60 px-3.5 py-3"
+            >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-semibold text-white">
-                  {item.title}
-                </span>
-                <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-300">
-                  {item.date}
+                <div className="flex items-center gap-2 min-w-0">
+                  <span
+                    className={`h-2 w-2 shrink-0 rounded-full ${
+                      idx === 0 ? 'bg-[#6DD58C]' : 'bg-zinc-600'
+                    }`}
+                  />
+                  <span className="truncate text-sm font-semibold text-[#E3E2E6]">
+                    {item.title}
+                  </span>
+                </div>
+                <span className="shrink-0 text-[10px] font-medium text-zinc-400 tabular-nums">
+                  {item.dateLabel}
                 </span>
               </div>
-              <p className="mt-0.5 text-xs text-zinc-400">{item.detail}</p>
+              <p className="mt-1 pl-4 text-[11px] leading-relaxed text-zinc-400">
+                {item.targetSummary}
+              </p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Remaining Launch Checklist */}
-      <div className="rounded-xl border border-white/[0.08] bg-[#121216] p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400">
-            Remaining Launch Checklist
-          </h3>
-          <span className="text-xs font-semibold text-[#EF4444]">
-            {completedCount}/{state.checklist.length} done
+      {/* Launch Checklist */}
+      <div className="rounded-[28px] bg-[#1B1E24] p-5">
+        <div className="mb-3.5 flex items-center justify-between">
+          <div className="inline-flex items-center gap-2">
+            <CheckCircle2 className="h-3.5 w-3.5 text-[#6DD58C]" />
+            <span className="text-[11px] font-semibold tracking-[0.14em] text-zinc-300 uppercase">
+              Checklist
+            </span>
+          </div>
+          <span className="text-[11px] font-semibold text-[#6DD58C] tabular-nums">
+            {completedCount}/{checklist.length}
           </span>
         </div>
 
         <div className="space-y-2">
-          {state.checklist.map((item) => (
+          {checklist.map((item) => (
             <button
               key={item.id}
               type="button"
               onClick={() => toggleChecklistItem(item.id)}
-              className="flex w-full items-start gap-3 rounded-lg border border-white/[0.06] bg-[#09090B] p-3 text-left transition hover:border-white/15"
+              className="flex w-full items-start gap-3 rounded-2xl bg-[#14171C]/60 px-3.5 py-3 text-left transition-colors hover:bg-[#14171C]"
             >
               <span
-                className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[10px] ${
+                className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
                   item.completed
-                    ? 'border-[#EF4444] bg-[#DC2626] text-white'
+                    ? 'border-[#6DD58C] bg-[#6DD58C] text-[#111318]'
                     : 'border-zinc-600 bg-transparent text-transparent'
                 }`}
               >
-                ✓
+                <Check className="h-2.5 w-2.5 stroke-[3]" />
               </span>
               <div className="min-w-0 flex-1">
                 <div
-                  className={`text-xs font-medium ${
+                  className={`text-xs font-medium leading-snug ${
                     item.completed
                       ? 'text-zinc-500 line-through'
-                      : 'text-zinc-100'
+                      : 'text-[#E3E2E6]'
                   }`}
                 >
                   {item.title}
                 </div>
-                <div className="mt-1 flex items-center gap-2 text-[10px] text-zinc-500">
-                  <span className="rounded bg-white/5 px-1.5 py-0.5 text-zinc-400">
-                    {item.category}
-                  </span>
-                  <span>Due {item.dueDate}</span>
+                <div className="mt-1 flex items-center gap-1.5 text-[10px] text-zinc-500">
+                  <span>{item.category}</span>
+                  <span>·</span>
+                  <span className="tabular-nums">{item.dueDate}</span>
                 </div>
               </div>
             </button>
@@ -127,3 +111,5 @@ export const CalendarTab: React.FC = () => {
     </div>
   );
 };
+
+export default CalendarTab;

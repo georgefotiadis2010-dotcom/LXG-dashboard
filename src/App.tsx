@@ -4,7 +4,6 @@ import {
   Target,
   Clapperboard,
   CalendarDays,
-  UserCircle2,
   RefreshCw,
   Wifi,
   WifiOff,
@@ -15,16 +14,14 @@ import DashboardTab from './components/DashboardTab';
 import GoalsTab from './components/GoalsTab';
 import { ContentTab } from './components/ContentTab';
 import { CalendarTab } from './components/CalendarTab';
-import { AccountTab } from './components/AccountTab';
 
-type TabId = 'dashboard' | 'goals' | 'content' | 'calendar' | 'account';
+type TabId = 'dashboard' | 'goals' | 'content' | 'calendar';
 
 const TABS: { id: TabId; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'goals', label: 'Goals', icon: Target },
   { id: 'content', label: 'Content', icon: Clapperboard },
   { id: 'calendar', label: 'Calendar', icon: CalendarDays },
-  { id: 'account', label: 'Account', icon: UserCircle2 },
 ];
 
 function SyncStatusPill() {
@@ -115,7 +112,6 @@ function CommandShell() {
           {activeTab === 'goals' && <GoalsTab />}
           {activeTab === 'content' && <ContentTab />}
           {activeTab === 'calendar' && <CalendarTab />}
-          {activeTab === 'account' && <AccountTab />}
         </main>
 
         {/* Material 3 Bottom Navigation Bar */}
@@ -123,7 +119,7 @@ function CommandShell() {
           aria-label="Primary navigation"
           className="fixed bottom-0 z-30 w-full max-w-[430px] bg-[#16181E]/95 px-3 pt-2 pb-[max(0.65rem,env(safe-area-inset-bottom))] backdrop-blur-xl"
         >
-          <div className="grid grid-cols-5 gap-1">
+          <div className="grid grid-cols-4 gap-1">
             {TABS.map(({ id, label, icon: Icon }) => {
               const active = activeTab === id;
               return (

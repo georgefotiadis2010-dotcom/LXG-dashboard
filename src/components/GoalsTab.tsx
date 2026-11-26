@@ -7,40 +7,22 @@ type GoalMode = 'target2027' | 'labelReadyRadar';
 interface GoalRowConfig {
   key: MetricKey;
   label: string;
-  subtitle: string;
 }
 
 const GOAL_ROWS: GoalRowConfig[] = [
-  {
-    key: 'monthlyListeners',
-    label: 'Monthly Spotify Listeners',
-    subtitle: 'Current listeners vs. 2027 / A&R threshold',
-  },
-  {
-    key: 'allTimeStreams',
-    label: 'All-Time Catalog Streams',
-    subtitle: 'Cumulative streams across all releases',
-  },
-  {
-    key: 'topSingleStreams',
-    label: 'Top Single Streams',
-    subtitle: 'Best Thing (28d) / breakout single',
-  },
-  {
-    key: 'instagramFollowers',
-    label: 'Instagram Followers',
-    subtitle: '@officiallxgmusic audience growth',
-  },
-  {
-    key: 'topReelViews',
-    label: 'Top Single Reel Views',
-    subtitle: 'Highest-performing short-form hook',
-  },
-  {
-    key: 'catalogReleases',
-    label: 'Catalog Releases',
-    subtitle: 'Active singles & waterfall drops',
-  },
+  { key: 'monthlyListeners', label: 'Monthly Listeners' },
+  { key: 'allTimeStreams', label: 'All-Time Streams' },
+  { key: 'topSingleStreams', label: 'Top Single Streams' },
+  { key: 'instagramFollowers', label: 'Instagram Followers' },
+  { key: 'topReelViews', label: 'Top Reel Views' },
+  { key: 'catalogReleases', label: 'Catalog Releases' },
+];
+
+const SPOTIFY_EDITABLE_KEYS: MetricKey[] = [
+  'monthlyListeners',
+  'allTimeStreams',
+  'topSingleStreams',
+  'catalogReleases',
 ];
 
 export const GoalsTab: React.FC = () => {
@@ -54,8 +36,6 @@ export const GoalsTab: React.FC = () => {
     monthlyListeners: String(metrics.monthlyListeners),
     allTimeStreams: String(metrics.allTimeStreams),
     topSingleStreams: String(metrics.topSingleStreams),
-    instagramFollowers: String(metrics.instagramFollowers),
-    topReelViews: String(metrics.topReelViews),
     catalogReleases: String(metrics.catalogReleases),
   });
 
@@ -64,8 +44,6 @@ export const GoalsTab: React.FC = () => {
       monthlyListeners: String(metrics.monthlyListeners),
       allTimeStreams: String(metrics.allTimeStreams),
       topSingleStreams: String(metrics.topSingleStreams),
-      instagramFollowers: String(metrics.instagramFollowers),
-      topReelViews: String(metrics.topReelViews),
       catalogReleases: String(metrics.catalogReleases),
     });
     setDrawerOpen(true);
@@ -88,11 +66,6 @@ export const GoalsTab: React.FC = () => {
         draft.topSingleStreams,
         metrics.topSingleStreams
       ),
-      instagramFollowers: parseNonNeg(
-        draft.instagramFollowers,
-        metrics.instagramFollowers
-      ),
-      topReelViews: parseNonNeg(draft.topReelViews, metrics.topReelViews),
       catalogReleases: parseNonNeg(
         draft.catalogReleases,
         metrics.catalogReleases
@@ -103,92 +76,76 @@ export const GoalsTab: React.FC = () => {
     setDrawerOpen(false);
   };
 
-  return (
-    <div className="space-y-4 pb-4">
-      {/* Mode Switcher */}
-      <div
-        className="grid grid-cols-2 gap-1.5 rounded-2xl bg-[#121216] p-1.5"
-        style={{ border: '1px solid rgba(255,255,255,0.08)' }}
-      >
-        <button
-          type="button"
-          onClick={() => setMode('target2027')}
-          className={`rounded-xl py-2 text-xs font-bold transition ${
-            mode === 'target2027'
-              ? 'bg-[#DC2626] text-white shadow'
-              : 'text-zinc-400 hover:text-white'
-          }`}
-        >
-          2027 Step 1 Targets
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode('labelReadyRadar')}
-          className={`rounded-xl py-2 text-xs font-bold transition ${
-            mode === 'labelReadyRadar'
-              ? 'bg-[#DC2626] text-white shadow'
-              : 'text-zinc-400 hover:text-white'
-          }`}
-        >
-          Label-Ready A&amp;R Radar
-        </button>
-      </div>
+  const barColor = mode === 'target2027' ? 'bg-[#6DD58C]' : 'bg-[#A8C7FA]';
 
-      {/* Header + Update Live Numbers CTA */}
-      <div className="flex items-center justify-between">
+  return (
+    <div className="mx-auto w-full max-w-[360px] space-y-4 px-2 pt-2 pb-8">
+      {/* Header + Update CTA */}
+      <div className="flex items-center justify-between px-1">
         <div>
-          <h2 className="text-sm font-bold text-white">
-            {mode === 'target2027'
-              ? 'Dec 20, 2027 Horizon'
-              : 'A&R Radar Thresholds'}
+          <h2 className="text-[11px] font-semibold tracking-[0.16em] text-zinc-400 uppercase">
+            {mode === 'target2027' ? '2027 Horizon' : 'A&R Radar'}
           </h2>
-          <p className="text-[11px] text-zinc-400">
-            Overall Portfolio: {metrics.overallPortfolioProgress.toFixed(1)}%
+          <p className="mt-0.5 text-xs font-medium text-zinc-500 tabular-nums">
+            Portfolio {metrics.overallPortfolioProgress.toFixed(1)}%
           </p>
         </div>
         <button
           type="button"
           onClick={openDrawer}
-          className="rounded-xl bg-[#DC2626] px-3.5 py-2 text-xs font-bold text-white shadow active:scale-95"
+          className="rounded-full bg-[#232730] px-3.5 py-1.5 text-[11px] font-medium text-[#E3E2E6] transition hover:bg-[#2C313C] active:scale-95"
         >
-          Update Live Numbers
+          Update
         </button>
       </div>
 
-      {/* Progress Cards */}
-      <div className="space-y-3">
+      {/* Mode Switcher */}
+      <div className="grid grid-cols-2 gap-1 rounded-full bg-[#1B1E24] p-1">
+        <button
+          type="button"
+          onClick={() => setMode('target2027')}
+          className={`rounded-full py-2 text-[11px] font-semibold transition ${
+            mode === 'target2027'
+              ? 'bg-[#232730] text-[#E3E2E6]'
+              : 'text-zinc-500 hover:text-zinc-300'
+          }`}
+        >
+          2027 Targets
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('labelReadyRadar')}
+          className={`rounded-full py-2 text-[11px] font-semibold transition ${
+            mode === 'labelReadyRadar'
+              ? 'bg-[#232730] text-[#E3E2E6]'
+              : 'text-zinc-500 hover:text-zinc-300'
+          }`}
+        >
+          A&amp;R Radar
+        </button>
+      </div>
+
+      {/* Goal Progress Card */}
+      <div className="space-y-4 rounded-[28px] bg-[#1B1E24] p-5">
         {GOAL_ROWS.map((row) => {
           const current = metrics[row.key];
           const target = METRIC_TARGETS[row.key][mode];
           const pct = target > 0 ? Math.min(100, (current / target) * 100) : 0;
 
           return (
-            <div
-              key={row.key}
-              className="rounded-2xl bg-[#121216] p-4"
-              style={{ border: '1px solid rgba(255,255,255,0.08)' }}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="text-xs font-bold text-white">{row.label}</div>
-                  <div className="text-[10px] text-zinc-500">{row.subtitle}</div>
-                </div>
-                <div className="text-right font-mono">
-                  <div className="text-xs font-bold text-white">
-                    {current.toLocaleString()}{' '}
-                    <span className="text-zinc-500">
-                      / {target.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="text-[10px] text-[#EF4444]">
-                    {pct.toFixed(1)}%
-                  </div>
-                </div>
+            <div key={row.key}>
+              <div className="mb-1.5 flex items-baseline justify-between gap-2 text-xs">
+                <span className="font-medium text-zinc-400">{row.label}</span>
+                <span className="font-semibold text-[#E3E2E6] tabular-nums">
+                  {current.toLocaleString()}{' '}
+                  <span className="font-normal text-zinc-500">
+                    / {target.toLocaleString()}
+                  </span>
+                </span>
               </div>
-
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-[#09090B] border border-white/5">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#111318]">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#DC2626] to-[#EF4444] transition-all duration-300"
+                  className={`h-full rounded-full ${barColor} transition-all duration-500`}
                   style={{ width: `${Math.max(pct, pct > 0 ? 2 : 0)}%` }}
                 />
               </div>
@@ -200,131 +157,56 @@ export const GoalsTab: React.FC = () => {
       {/* Update Live Numbers Slide-Up Drawer */}
       {drawerOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm"
           onClick={() => setDrawerOpen(false)}
         >
           <form
             onSubmit={handleSave}
-            className="w-full max-w-[430px] rounded-t-3xl bg-[#121216] p-5 pb-8"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.12)' }}
+            className="w-full max-w-[430px] rounded-t-[28px] bg-[#1B1E24] p-6 pb-8"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-zinc-700" />
-            <h3 className="text-base font-bold text-white">
-              Update Live Numbers
+            <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-zinc-700" />
+            <h3 className="text-sm font-semibold text-[#E3E2E6]">
+              Update Spotify Numbers
             </h3>
-            <p className="mt-0.5 text-xs text-zinc-400">
-              Recalculates all 2027 &amp; A&amp;R progress bars immediately.
+            <p className="mt-0.5 text-xs text-zinc-500">
+              Instagram metrics sync automatically and are read-only.
             </p>
 
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <label className="block">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                  Monthly Listeners
-                </span>
-                <input
-                  type="number"
-                  min={0}
-                  value={draft.monthlyListeners}
-                  onChange={(e) =>
-                    setDraft((d) => ({ ...d, monthlyListeners: e.target.value }))
-                  }
-                  className="mt-1 w-full rounded-xl bg-[#09090B] px-3 py-2 font-mono text-sm text-white border border-white/10 focus:border-[#DC2626] focus:outline-none"
-                />
-              </label>
-
-              <label className="block">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                  All-Time Streams
-                </span>
-                <input
-                  type="number"
-                  min={0}
-                  value={draft.allTimeStreams}
-                  onChange={(e) =>
-                    setDraft((d) => ({ ...d, allTimeStreams: e.target.value }))
-                  }
-                  className="mt-1 w-full rounded-xl bg-[#09090B] px-3 py-2 font-mono text-sm text-white border border-white/10 focus:border-[#DC2626] focus:outline-none"
-                />
-              </label>
-
-              <label className="block">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                  Top Track Streams
-                </span>
-                <input
-                  type="number"
-                  min={0}
-                  value={draft.topSingleStreams}
-                  onChange={(e) =>
-                    setDraft((d) => ({ ...d, topSingleStreams: e.target.value }))
-                  }
-                  className="mt-1 w-full rounded-xl bg-[#09090B] px-3 py-2 font-mono text-sm text-white border border-white/10 focus:border-[#DC2626] focus:outline-none"
-                />
-              </label>
-
-              <label className="block">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                  IG Followers
-                </span>
-                <input
-                  type="number"
-                  min={0}
-                  value={draft.instagramFollowers}
-                  onChange={(e) =>
-                    setDraft((d) => ({
-                      ...d,
-                      instagramFollowers: e.target.value,
-                    }))
-                  }
-                  className="mt-1 w-full rounded-xl bg-[#09090B] px-3 py-2 font-mono text-sm text-white border border-white/10 focus:border-[#DC2626] focus:outline-none"
-                />
-              </label>
-
-              <label className="block">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                  Top Reel Views
-                </span>
-                <input
-                  type="number"
-                  min={0}
-                  value={draft.topReelViews}
-                  onChange={(e) =>
-                    setDraft((d) => ({ ...d, topReelViews: e.target.value }))
-                  }
-                  className="mt-1 w-full rounded-xl bg-[#09090B] px-3 py-2 font-mono text-sm text-white border border-white/10 focus:border-[#DC2626] focus:outline-none"
-                />
-              </label>
-
-              <label className="block">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                  Catalog Releases
-                </span>
-                <input
-                  type="number"
-                  min={0}
-                  value={draft.catalogReleases}
-                  onChange={(e) =>
-                    setDraft((d) => ({ ...d, catalogReleases: e.target.value }))
-                  }
-                  className="mt-1 w-full rounded-xl bg-[#09090B] px-3 py-2 font-mono text-sm text-white border border-white/10 focus:border-[#DC2626] focus:outline-none"
-                />
-              </label>
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              {GOAL_ROWS.filter((row) =>
+                SPOTIFY_EDITABLE_KEYS.includes(row.key)
+              ).map((row) => (
+                <label key={row.key} className="block">
+                  <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                    {row.label}
+                  </span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={draft[row.key as keyof typeof draft]}
+                    onChange={(e) =>
+                      setDraft((d) => ({ ...d, [row.key]: e.target.value }))
+                    }
+                    className="mt-1.5 w-full rounded-2xl bg-[#111318] px-3.5 py-2.5 text-sm font-medium text-[#E3E2E6] tabular-nums focus:ring-1 focus:ring-white/20 focus:outline-none"
+                  />
+                </label>
+              ))}
             </div>
 
-            <div className="mt-5 flex gap-2">
+            <div className="mt-6 flex gap-2.5">
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
-                className="flex-1 rounded-xl bg-white/10 py-2.5 text-xs font-bold uppercase tracking-wider text-zinc-300"
+                className="flex-1 rounded-full bg-[#232730] py-2.5 text-xs font-semibold text-zinc-300 transition hover:bg-[#2C313C]"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 rounded-xl bg-[#DC2626] py-2.5 text-xs font-bold uppercase tracking-wider text-white"
+                className="flex-1 rounded-full bg-[#E3E2E6] py-2.5 text-xs font-semibold text-[#111318] transition hover:bg-white"
               >
-                Save Numbers
+                Save
               </button>
             </div>
           </form>
