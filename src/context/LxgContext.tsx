@@ -274,9 +274,8 @@ function loadInitialState(): LxgState {
         ...INITIAL_STATE.syncSettings,
         ...(parsed.syncSettings ?? {}),
         webAppUrl:
-          parsed.syncSettings?.webAppUrl?.includes('AKfycbyk_G6mF_PbZkrrr7koOLor0L9PofmqFm1QRAtWC0717DXkfKzABXgGI9eNIVZHvk6L')
-            ? INITIAL_STATE.syncSettings.webAppUrl
-            : (parsed.syncSettings?.webAppUrl ?? INITIAL_STATE.syncSettings.webAppUrl),
+          INITIAL_STATE.syncSettings.webAppUrl ||
+          (parsed.syncSettings?.webAppUrl ?? INITIAL_STATE.syncSettings.webAppUrl),
       },
       pipeline: Array.isArray(parsed.pipeline) ? parsed.pipeline : INITIAL_STATE.pipeline,
       checklist: Array.isArray(parsed.checklist) ? parsed.checklist : INITIAL_STATE.checklist,
