@@ -32,6 +32,19 @@ function formatMonthPill(fullLabel: string, monthCode: string): string {
   return year ? `${monthTitle} ${year}` : monthTitle;
 }
 
+function formatGoalValue(value: number, decimals?: number, suffix?: string): string {
+  let formatted: string;
+  if (typeof decimals === 'number' && decimals > 0) {
+    formatted = value.toFixed(decimals);
+  } else if (value >= 1000) {
+    const k = value / 1000;
+    formatted = `${Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1)}K`;
+  } else {
+    formatted = value.toLocaleString();
+  }
+  return `${formatted}${suffix ?? ''}`;
+}
+
 export const HeroTelemetry: React.FC<HeroTelemetryProps> = ({
   activePlatform,
   telemetry,
@@ -55,11 +68,11 @@ export const HeroTelemetry: React.FC<HeroTelemetryProps> = ({
             return (
               <div
                 key={platform}
-                className="flex min-w-0 flex-col justify-between rounded-[24px] bg-white/[0.04] p-3.5 backdrop-blur-sm sm:p-5"
+                className="flex min-w-0 flex-col justify-between rounded-[24px] bg-white/[0.04] p-3 backdrop-blur-sm sm:p-5"
               >
                 {/* Platform Header */}
-                <div className="flex items-center justify-between gap-1.5">
-                  <div className="flex min-w-0 items-center gap-2">
+                <div className="flex items-center justify-between gap-1">
+                  <div className="flex min-w-0 items-center gap-1.5">
                     <span
                       className="h-2 w-2 shrink-0 rounded-full"
                       style={{ backgroundColor: accent, boxShadow: `0 0 10px ${accent}88` }}
@@ -69,8 +82,15 @@ export const HeroTelemetry: React.FC<HeroTelemetryProps> = ({
                       {config.label}
                     </span>
                   </div>
-                  <span className="rounded-full bg-white/[0.07] px-2 py-0.5 font-sans-ui text-[10px] font-medium text-[#A1A7B3]">
-                    {toSentenceCase(snapshot.month)}
+                  <span
+                    className="shrink-0 rounded-full px-2 py-0.5 font-sans-ui text-[10px] font-medium"
+                    style={
+                      snapshot.isGoalMonth
+                        ? { color: accent, backgroundColor: `${accent}1F` }
+                        : { color: '#A1A7B3', backgroundColor: 'rgba(255,255,255,0.07)' }
+                    }
+                  >
+                    {toSentenceCase(snapshot.month)} · {snapshot.isGoalMonth ? 'Goal' : 'Live'}
                   </span>
                 </div>
 
@@ -78,10 +98,10 @@ export const HeroTelemetry: React.FC<HeroTelemetryProps> = ({
                 <button
                   type="button"
                   onClick={() => onOpenSheet(platform)}
-                  className="group my-auto flex flex-col items-start py-2 text-left focus:outline-none"
+                  className="group my-auto flex flex-col items-start py-1.5 text-left focus:outline-none"
                   aria-label={`Open ${config.label} details`}
                 >
-                  <span className="font-sans-ui mb-1.5 block text-[11px] font-medium text-[#8E94A0]">
+                  <span className="font-sans-ui mb-1 block text-[11px] font-medium text-[#8E94A0]">
                     {toSentenceCase(config.heroLabel)}
                   </span>
                   <OdometerNumber
@@ -91,30 +111,35 @@ export const HeroTelemetry: React.FC<HeroTelemetryProps> = ({
                     style={{
                       fontSize:
                         digitCount >= 4
-                          ? 'clamp(2.5rem, min(11dvh, 11.5vw), 5.25rem)'
-                          : 'clamp(3rem, min(13dvh, 14vw), 6rem)',
+                          ? 'clamp(2.35rem, min(10dvh, 11vw), 5rem)'
+                          : 'clamp(2.85rem, min(12dvh, 13.5vw), 5.75rem)',
                     }}
                   />
-                  <motion.span
-                    key={`${platform}-${snapshot.month}-${snapshot.delta}`}
-                    initial={{ scale: 0.92, opacity: 0.7 }}
-                    animate={{ scale: [0.92, 1.06, 1], opacity: 1 }}
-                    transition={{ duration: 0.34, ease: EXPRESSIVE_EASE }}
-                    className="mt-2 inline-flex items-center gap-0.5 rounded-full px-2.5 py-0.5 font-sans-ui text-[11px] font-semibold"
-                    style={{
-                      color: snapshot.deltaPositive ? accent : '#FF2E63',
-                      backgroundColor: snapshot.deltaPositive
-                        ? `${accent}1F`
-                        : 'rgba(255, 46, 99, 0.16)',
-                    }}
-                  >
-                    {snapshot.deltaPositive ? (
-                      <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
-                    ) : (
-                      <ArrowDownRight className="h-3 w-3" aria-hidden="true" />
-                    )}
-                    {snapshot.delta}
-                  </motion.span>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    <motion.span
+                      key={`${platform}-${snapshot.month}-${snapshot.delta}`}
+                      initial={{ scale: 0.92, opacity: 0.7 }}
+                      animate={{ scale: [0.92, 1.06, 1], opacity: 1 }}
+                      transition={{ duration: 0.34, ease: EXPRESSIVE_EASE }}
+                      className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 font-sans-ui text-[10.5px] font-semibold"
+                      style={{
+                        color: snapshot.deltaPositive ? accent : '#FF2E63',
+                        backgroundColor: snapshot.deltaPositive
+                          ? `${accent}1F`
+                          : 'rgba(255, 46, 99, 0.16)',
+                      }}
+                    >
+                      {snapshot.deltaPositive ? (
+                        <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+                      ) : (
+                        <ArrowDownRight className="h-3 w-3" aria-hidden="true" />
+                      )}
+                      {snapshot.delta}
+                    </motion.span>
+                    <span className="font-sans-ui text-[10.5px] font-medium text-[#8E94A0]">
+                      Goal {snapshot.heroGoal.toLocaleString()}
+                    </span>
+                  </div>
                 </button>
 
                 {/* Tonal Secondary Stats */}
@@ -124,11 +149,18 @@ export const HeroTelemetry: React.FC<HeroTelemetryProps> = ({
                       key={stat.id}
                       type="button"
                       onClick={() => onOpenSheet(platform, stat.id)}
-                      className="flex w-full items-center justify-between rounded-xl bg-white/[0.04] px-2.5 py-2 text-left transition-all hover:bg-white/[0.08] active:scale-[0.98] focus:outline-none"
+                      className="flex w-full items-center justify-between rounded-xl bg-white/[0.04] px-2.5 py-1.5 text-left transition-all hover:bg-white/[0.08] active:scale-[0.98] focus:outline-none"
                     >
-                      <span className="font-sans-ui truncate pr-2 text-[11px] font-medium text-[#8E94A0]">
-                        {toSentenceCase(stat.label)}
-                      </span>
+                      <div className="min-w-0 pr-2">
+                        <span className="font-sans-ui block truncate text-[10.5px] font-medium text-[#A1A7B3]">
+                          {toSentenceCase(stat.label)}
+                        </span>
+                        {typeof stat.goal === 'number' && (
+                          <span className="font-sans-ui block truncate text-[9.5px] font-medium text-[#8E94A0]">
+                            Goal {formatGoalValue(stat.goal, stat.decimals, stat.suffix)}
+                          </span>
+                        )}
+                      </div>
                       <span className="font-display shrink-0 text-[13px] font-semibold tabular-nums tracking-tight text-[#F8F9FA]">
                         <OdometerNumber
                           value={stat.value}
@@ -170,41 +202,58 @@ export const HeroTelemetry: React.FC<HeroTelemetryProps> = ({
           transition={{ duration: 0.28, ease: EXPRESSIVE_EASE }}
           className="flex min-h-0 flex-1 flex-col justify-center py-2"
         >
-          {/* Title + Month Tonal Pill + Kinetic Delta Badge */}
-          <div className="mb-2 flex items-center justify-between gap-2 sm:mb-3">
-            <div className="flex min-w-0 items-center gap-2">
+          {/* Title + Month Pill + Live/Goal Pill + Hero Goal & Delta */}
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 sm:mb-3">
+            <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2">
               <span className="font-sans-ui truncate text-[13px] font-medium text-[#A1A7B3]">
                 {toSentenceCase(config.heroLabel)}
               </span>
               <span className="shrink-0 rounded-full bg-white/[0.07] px-2.5 py-0.5 font-sans-ui text-[11px] font-medium text-[#C4C9D4]">
                 {formatMonthPill(snapshot.fullLabel, snapshot.month)}
               </span>
+              <span
+                className="shrink-0 rounded-full px-2.5 py-0.5 font-sans-ui text-[11px] font-medium"
+                style={
+                  snapshot.isGoalMonth
+                    ? { color: accent, backgroundColor: `${accent}1F` }
+                    : { color: '#A1A7B3', backgroundColor: 'rgba(255, 255, 255, 0.06)' }
+                }
+              >
+                {snapshot.isGoalMonth ? 'Monthly goal' : 'Live'}
+              </span>
             </div>
 
-            <motion.div
-              key={`${platform}-${snapshot.month}-${snapshot.delta}`}
-              initial={{ scale: 0.9, opacity: 0.6 }}
-              animate={{ scale: [0.9, 1.07, 1], opacity: 1 }}
-              transition={{
-                type: 'spring',
-                stiffness: 360,
-                damping: 24,
-              }}
-              className="inline-flex shrink-0 items-center gap-1 rounded-full px-3 py-1 font-sans-ui text-xs font-semibold"
-              style={{
-                color: snapshot.deltaPositive ? accent : '#FF2E63',
-                backgroundColor: snapshot.deltaPositive
-                  ? `${accent}20`
-                  : 'rgba(255, 46, 99, 0.16)',
-              }}
-            >
-              {snapshot.deltaPositive ? (
-                <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-              ) : (
-                <ArrowDownRight className="h-3.5 w-3.5" aria-hidden="true" />
-              )}
-              <span>{snapshot.delta}</span>
-            </motion.div>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="font-sans-ui text-xs font-medium text-[#8E94A0]">
+                {snapshot.isGoalMonth
+                  ? `${snapshot.heroGoal.toLocaleString()} target`
+                  : `Goal ${snapshot.heroGoal.toLocaleString()}`}
+              </span>
+              <motion.div
+                key={`${platform}-${snapshot.month}-${snapshot.delta}`}
+                initial={{ scale: 0.9, opacity: 0.6 }}
+                animate={{ scale: [0.9, 1.07, 1], opacity: 1 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 360,
+                  damping: 24,
+                }}
+                className="inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 font-sans-ui text-xs font-semibold sm:px-3"
+                style={{
+                  color: snapshot.deltaPositive ? accent : '#FF2E63',
+                  backgroundColor: snapshot.deltaPositive
+                    ? `${accent}20`
+                    : 'rgba(255, 46, 99, 0.16)',
+                }}
+              >
+                {snapshot.deltaPositive ? (
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                ) : (
+                  <ArrowDownRight className="h-3.5 w-3.5" aria-hidden="true" />
+                )}
+                <span>{snapshot.delta}</span>
+              </motion.div>
+            </div>
           </div>
 
           {/* Massive hero numeral */}
@@ -212,7 +261,7 @@ export const HeroTelemetry: React.FC<HeroTelemetryProps> = ({
             type="button"
             onClick={() => onOpenSheet(platform)}
             className="group flex w-full items-baseline text-left focus:outline-none"
-            aria-label={`${toSentenceCase(config.heroLabel)}: ${snapshot.heroValue}. Tap for 30-day trend`}
+            aria-label={`${toSentenceCase(config.heroLabel)}: ${snapshot.heroValue}, Goal ${snapshot.heroGoal}. Tap for 30-day trend`}
           >
             <OdometerNumber
               value={snapshot.heroValue}
@@ -240,12 +289,12 @@ export const HeroTelemetry: React.FC<HeroTelemetryProps> = ({
             key={stat.id}
             type="button"
             onClick={() => onOpenSheet(platform, stat.id)}
-            className="touch-target group flex min-w-0 flex-col justify-between rounded-2xl bg-white/[0.045] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.08] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/25 sm:px-4 sm:py-3.5"
+            className="touch-target group flex min-w-0 flex-col justify-between rounded-2xl bg-white/[0.045] px-3 py-2.5 text-left transition-all duration-200 hover:bg-white/[0.08] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/25 sm:px-4 sm:py-3.5"
           >
-            <span className="font-sans-ui block w-full truncate text-[11px] font-medium text-[#8E94A0] sm:text-xs">
+            <span className="font-sans-ui block w-full truncate text-[11px] font-medium text-[#A1A7B3] sm:text-xs">
               {toSentenceCase(stat.label)}
             </span>
-            <div className="mt-1.5 flex items-baseline justify-between gap-1">
+            <div className="mt-1 flex items-baseline justify-between gap-1">
               <span className="font-display text-xl font-bold tabular-nums tracking-[-0.03em] text-[#F8F9FA] sm:text-2xl">
                 <OdometerNumber
                   value={stat.value}
@@ -263,6 +312,11 @@ export const HeroTelemetry: React.FC<HeroTelemetryProps> = ({
                 {stat.delta}
               </span>
             </div>
+            {typeof stat.goal === 'number' && (
+              <span className="font-sans-ui mt-0.5 block w-full truncate text-[10px] font-medium text-[#8E94A0] sm:text-[11px]">
+                Goal {formatGoalValue(stat.goal, stat.decimals, stat.suffix)}
+              </span>
+            )}
           </button>
         ))}
       </div>

@@ -106,6 +106,7 @@ export interface TelemetrySecondaryStat {
   id: string;
   label: string;
   value: number;
+  goal?: number;
   suffix?: string;
   decimals?: number;
   delta: string;
@@ -125,7 +126,9 @@ export interface TelemetryTopCallout {
 export interface TelemetryMonthSnapshot {
   month: TelemetryMonthCode;
   fullLabel: string;
+  isGoalMonth?: boolean;
   heroValue: number;
+  heroGoal: number;
   delta: string;
   deltaPositive: boolean;
   secondaryStats: [

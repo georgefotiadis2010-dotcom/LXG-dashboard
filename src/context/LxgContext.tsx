@@ -77,13 +77,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'NOV',
           fullLabel: 'NOVEMBER 2026',
+          isGoalMonth: false,
           heroValue: 40,
+          heroGoal: 50,
           delta: '+14.3%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'sp-streams', label: 'STREAMS', value: 350, delta: '+12.9%', deltaPositive: true },
-            { id: 'sp-followers', label: 'FOLLOWERS', value: 32, delta: '+14.3%', deltaPositive: true },
-            { id: 'sp-top-single', label: 'TOP SINGLE', value: 59, delta: '+18.0%', deltaPositive: true },
+            { id: 'sp-streams', label: 'STREAMS', value: 350, goal: 400, delta: '+12.9%', deltaPositive: true },
+            { id: 'sp-followers', label: 'FOLLOWERS', value: 32, goal: 40, delta: '+14.3%', deltaPositive: true },
+            { id: 'sp-top-single', label: 'TOP SINGLE', value: 59, goal: 75, delta: '+18.0%', deltaPositive: true },
           ],
           sparkline: [
             26, 27, 27, 28, 29, 29, 30, 31, 31, 32,
@@ -103,13 +105,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'DEC',
           fullLabel: 'DECEMBER 2026',
+          isGoalMonth: true,
           heroValue: 65,
+          heroGoal: 65,
           delta: '+62.5%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'sp-streams', label: 'STREAMS', value: 520, delta: '+48.6%', deltaPositive: true },
-            { id: 'sp-followers', label: 'FOLLOWERS', value: 48, delta: '+50.0%', deltaPositive: true },
-            { id: 'sp-top-single', label: 'TOP SINGLE', value: 145, delta: '+145.8%', deltaPositive: true },
+            { id: 'sp-streams', label: 'STREAMS', value: 520, goal: 520, delta: '+48.6%', deltaPositive: true },
+            { id: 'sp-followers', label: 'FOLLOWERS', value: 48, goal: 48, delta: '+50.0%', deltaPositive: true },
+            { id: 'sp-top-single', label: 'TOP SINGLE', value: 145, goal: 145, delta: '+145.8%', deltaPositive: true },
           ],
           sparkline: [
             40, 41, 42, 43, 45, 47, 48, 49, 50, 51,
@@ -129,13 +133,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'JAN',
           fullLabel: 'JANUARY 2027',
+          isGoalMonth: true,
           heroValue: 110,
+          heroGoal: 110,
           delta: '+69.2%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'sp-streams', label: 'STREAMS', value: 890, delta: '+71.2%', deltaPositive: true },
-            { id: 'sp-followers', label: 'FOLLOWERS', value: 74, delta: '+54.2%', deltaPositive: true },
-            { id: 'sp-top-single', label: 'TOP SINGLE', value: 260, delta: '+79.3%', deltaPositive: true },
+            { id: 'sp-streams', label: 'STREAMS', value: 890, goal: 890, delta: '+71.2%', deltaPositive: true },
+            { id: 'sp-followers', label: 'FOLLOWERS', value: 74, goal: 74, delta: '+54.2%', deltaPositive: true },
+            { id: 'sp-top-single', label: 'TOP SINGLE', value: 260, goal: 260, delta: '+79.3%', deltaPositive: true },
           ],
           sparkline: [
             65, 67, 69, 71, 73, 75, 77, 79, 81, 83,
@@ -155,13 +161,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'FEB',
           fullLabel: 'FEBRUARY 2027',
+          isGoalMonth: true,
           heroValue: 165,
+          heroGoal: 165,
           delta: '+50.0%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'sp-streams', label: 'STREAMS', value: 1380, delta: '+55.1%', deltaPositive: true },
-            { id: 'sp-followers', label: 'FOLLOWERS', value: 108, delta: '+45.9%', deltaPositive: true },
-            { id: 'sp-top-single', label: 'TOP SINGLE', value: 410, delta: '+57.7%', deltaPositive: true },
+            { id: 'sp-streams', label: 'STREAMS', value: 1380, goal: 1380, delta: '+55.1%', deltaPositive: true },
+            { id: 'sp-followers', label: 'FOLLOWERS', value: 108, goal: 108, delta: '+45.9%', deltaPositive: true },
+            { id: 'sp-top-single', label: 'TOP SINGLE', value: 410, goal: 410, delta: '+57.7%', deltaPositive: true },
           ],
           sparkline: [
             110, 112, 114, 116, 118, 120, 122, 124, 126, 128,
@@ -181,13 +189,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'MAR',
           fullLabel: 'MARCH 2027',
+          isGoalMonth: true,
           heroValue: 235,
+          heroGoal: 235,
           delta: '+42.4%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'sp-streams', label: 'STREAMS', value: 1960, delta: '+42.0%', deltaPositive: true },
-            { id: 'sp-followers', label: 'FOLLOWERS', value: 152, delta: '+40.7%', deltaPositive: true },
-            { id: 'sp-top-single', label: 'TOP SINGLE', value: 580, delta: '+41.5%', deltaPositive: true },
+            { id: 'sp-streams', label: 'STREAMS', value: 1960, goal: 1960, delta: '+42.0%', deltaPositive: true },
+            { id: 'sp-followers', label: 'FOLLOWERS', value: 152, goal: 152, delta: '+40.7%', deltaPositive: true },
+            { id: 'sp-top-single', label: 'TOP SINGLE', value: 580, goal: 580, delta: '+41.5%', deltaPositive: true },
           ],
           sparkline: [
             165, 168, 170, 173, 176, 179, 181, 184, 187, 190,
@@ -207,13 +217,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'APR',
           fullLabel: 'APRIL 2027',
+          isGoalMonth: true,
           heroValue: 320,
+          heroGoal: 320,
           delta: '+36.2%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'sp-streams', label: 'STREAMS', value: 2680, delta: '+36.7%', deltaPositive: true },
-            { id: 'sp-followers', label: 'FOLLOWERS', value: 205, delta: '+34.9%', deltaPositive: true },
-            { id: 'sp-top-single', label: 'TOP SINGLE', value: 790, delta: '+36.2%', deltaPositive: true },
+            { id: 'sp-streams', label: 'STREAMS', value: 2680, goal: 2680, delta: '+36.7%', deltaPositive: true },
+            { id: 'sp-followers', label: 'FOLLOWERS', value: 205, goal: 205, delta: '+34.9%', deltaPositive: true },
+            { id: 'sp-top-single', label: 'TOP SINGLE', value: 790, goal: 790, delta: '+36.2%', deltaPositive: true },
           ],
           sparkline: [
             235, 238, 241, 244, 247, 250, 253, 256, 259, 262,
@@ -254,13 +266,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'NOV',
           fullLabel: 'NOVEMBER 2026',
+          isGoalMonth: false,
           heroValue: 123,
+          heroGoal: 150,
           delta: '+18.3%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'ig-views', label: 'REEL VIEWS', value: 6894, delta: '+24.1%', deltaPositive: true },
-            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 7.8, suffix: '%', decimals: 1, delta: '+1.2%', deltaPositive: true },
-            { id: 'ig-top-reel', label: 'TOP REEL', value: 1212, delta: '+41.0%', deltaPositive: true },
+            { id: 'ig-views', label: 'REEL VIEWS', value: 6894, goal: 8000, delta: '+24.1%', deltaPositive: true },
+            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 7.8, goal: 8.0, suffix: '%', decimals: 1, delta: '+1.2%', deltaPositive: true },
+            { id: 'ig-top-reel', label: 'TOP REEL', value: 1212, goal: 1500, delta: '+41.0%', deltaPositive: true },
           ],
           sparkline: [
             88, 90, 91, 92, 94, 95, 97, 98, 99, 101,
@@ -280,13 +294,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'DEC',
           fullLabel: 'DECEMBER 2026',
+          isGoalMonth: true,
           heroValue: 220,
+          heroGoal: 220,
           delta: '+78.9%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'ig-views', label: 'REEL VIEWS', value: 10400, delta: '+50.9%', deltaPositive: true },
-            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 8.1, suffix: '%', decimals: 1, delta: '+0.3%', deltaPositive: true },
-            { id: 'ig-top-reel', label: 'TOP REEL', value: 2100, delta: '+73.3%', deltaPositive: true },
+            { id: 'ig-views', label: 'REEL VIEWS', value: 10400, goal: 10400, delta: '+50.9%', deltaPositive: true },
+            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 8.1, goal: 8.1, suffix: '%', decimals: 1, delta: '+0.3%', deltaPositive: true },
+            { id: 'ig-top-reel', label: 'TOP REEL', value: 2100, goal: 2100, delta: '+73.3%', deltaPositive: true },
           ],
           sparkline: [
             123, 126, 129, 133, 136, 140, 144, 148, 151, 155,
@@ -306,13 +322,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'JAN',
           fullLabel: 'JANUARY 2027',
+          isGoalMonth: true,
           heroValue: 380,
+          heroGoal: 380,
           delta: '+72.7%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'ig-views', label: 'REEL VIEWS', value: 16800, delta: '+61.5%', deltaPositive: true },
-            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 8.4, suffix: '%', decimals: 1, delta: '+0.3%', deltaPositive: true },
-            { id: 'ig-top-reel', label: 'TOP REEL', value: 3400, delta: '+61.9%', deltaPositive: true },
+            { id: 'ig-views', label: 'REEL VIEWS', value: 16800, goal: 16800, delta: '+61.5%', deltaPositive: true },
+            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 8.4, goal: 8.4, suffix: '%', decimals: 1, delta: '+0.3%', deltaPositive: true },
+            { id: 'ig-top-reel', label: 'TOP REEL', value: 3400, goal: 3400, delta: '+61.9%', deltaPositive: true },
           ],
           sparkline: [
             220, 225, 230, 236, 241, 247, 253, 259, 264, 270,
@@ -332,13 +350,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'FEB',
           fullLabel: 'FEBRUARY 2027',
+          isGoalMonth: true,
           heroValue: 560,
+          heroGoal: 560,
           delta: '+47.4%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'ig-views', label: 'REEL VIEWS', value: 23500, delta: '+39.9%', deltaPositive: true },
-            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 8.2, suffix: '%', decimals: 1, delta: '-0.2%', deltaPositive: false },
-            { id: 'ig-top-reel', label: 'TOP REEL', value: 4600, delta: '+35.3%', deltaPositive: true },
+            { id: 'ig-views', label: 'REEL VIEWS', value: 23500, goal: 23500, delta: '+39.9%', deltaPositive: true },
+            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 8.2, goal: 8.2, suffix: '%', decimals: 1, delta: '-0.2%', deltaPositive: false },
+            { id: 'ig-top-reel', label: 'TOP REEL', value: 4600, goal: 4600, delta: '+35.3%', deltaPositive: true },
           ],
           sparkline: [
             380, 386, 392, 398, 405, 411, 418, 424, 431, 437,
@@ -358,13 +378,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'MAR',
           fullLabel: 'MARCH 2027',
+          isGoalMonth: true,
           heroValue: 790,
+          heroGoal: 790,
           delta: '+41.1%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'ig-views', label: 'REEL VIEWS', value: 31200, delta: '+32.8%', deltaPositive: true },
-            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 8.7, suffix: '%', decimals: 1, delta: '+0.5%', deltaPositive: true },
-            { id: 'ig-top-reel', label: 'TOP REEL', value: 6200, delta: '+34.8%', deltaPositive: true },
+            { id: 'ig-views', label: 'REEL VIEWS', value: 31200, goal: 31200, delta: '+32.8%', deltaPositive: true },
+            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 8.7, goal: 8.7, suffix: '%', decimals: 1, delta: '+0.5%', deltaPositive: true },
+            { id: 'ig-top-reel', label: 'TOP REEL', value: 6200, goal: 6200, delta: '+34.8%', deltaPositive: true },
           ],
           sparkline: [
             560, 568, 576, 584, 592, 600, 608, 616, 624, 632,
@@ -384,13 +406,15 @@ export const LXG_TELEMETRY_CONFIG: LxgTelemetryConfig = {
         {
           month: 'APR',
           fullLabel: 'APRIL 2027',
+          isGoalMonth: true,
           heroValue: 1050,
+          heroGoal: 1050,
           delta: '+32.9%',
           deltaPositive: true,
           secondaryStats: [
-            { id: 'ig-views', label: 'REEL VIEWS', value: 40500, delta: '+29.8%', deltaPositive: true },
-            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 9.0, suffix: '%', decimals: 1, delta: '+0.3%', deltaPositive: true },
-            { id: 'ig-top-reel', label: 'TOP REEL', value: 8100, delta: '+30.6%', deltaPositive: true },
+            { id: 'ig-views', label: 'REEL VIEWS', value: 40500, goal: 40500, delta: '+29.8%', deltaPositive: true },
+            { id: 'ig-engagement', label: 'ENGAGEMENT', value: 9.0, goal: 9.0, suffix: '%', decimals: 1, delta: '+0.3%', deltaPositive: true },
+            { id: 'ig-top-reel', label: 'TOP REEL', value: 8100, goal: 8100, delta: '+30.6%', deltaPositive: true },
           ],
           sparkline: [
             790, 799, 808, 817, 826, 835, 844, 853, 862, 871,
