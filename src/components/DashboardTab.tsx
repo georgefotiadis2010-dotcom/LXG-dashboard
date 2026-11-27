@@ -87,13 +87,13 @@ interface MetricCardItem {
 }
 
 const MetricTile: React.FC<MetricCardItem> = ({ label, value, trend, Icon }) => (
-  <div className="flex flex-col items-center rounded-2xl bg-[#14171C]/60 px-2 py-3 text-center">
-    <Icon className="h-3.5 w-3.5 text-zinc-400" />
-    <span className="mt-1.5 text-[10px] font-medium tracking-wider text-zinc-500 uppercase">
+  <div className="flex flex-col items-center rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-card)] px-2 py-3 text-center transition hover:border-red-500/30">
+    <Icon className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+    <span className="mt-1.5 text-[10px] font-medium tracking-wider text-[var(--text-muted)] uppercase">
       {label}
     </span>
     <div className="mt-0.5 inline-flex items-center gap-1">
-      <span className="text-lg font-bold tracking-tight text-[#E3E2E6] tabular-nums">
+      <span className="text-lg font-bold tracking-tight text-[var(--text-primary)] tabular-nums">
         {value}
       </span>
       <TrendArrow trend={trend} />
@@ -292,20 +292,47 @@ export const DashboardTab: React.FC = () => {
     },
   ];
 
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysRemaining = Math.max(1, daysInMonth - now.getDate());
+  const listenersRemaining = Math.max(0, monthlyGoal - metrics.monthlyListeners);
+  const dailyPaceNeeded =
+    listenersRemaining === 0 ? 0 : Math.ceil(listenersRemaining / daysRemaining);
+  const followerConversion =
+    metrics.monthlyListeners > 0
+      ? ((metrics.spotifyFollowers / metrics.monthlyListeners) * 100).toFixed(1)
+      : '0.0';
+  const streamsPerListener =
+    metrics.monthlyListeners > 0
+      ? (metrics.allTimeStreams / metrics.monthlyListeners).toFixed(1)
+      : '0.0';
+  const highPriorityPending = state.checklist.filter(
+    (item) => !item.completed && item.priority === 'HIGH'
+  ).length;
+
   return (
-    <div className="pb-6">
-      {/* Centered Hero: Monthly Listeners + Goal Progress */}
-      <section className="flex min-h-[calc(100dvh-10.5rem)] w-full flex-col items-center justify-center">
-        <div className="w-full px-3 sm:px-6 text-center">
-          <div className="text-8xl sm:text-9xl font-bold tracking-tighter text-[#E3E2E6] tabular-nums">
-            {metrics.monthlyListeners.toLocaleString()}
-          </div>
-          <div className="mt-2 inline-flex items-center justify-center gap-2 text-xs font-semibold tracking-[0.24em] text-zinc-400 uppercase">
-            <span>Monthly Listeners</span>
-            <TrendArrow trend={listenerTrend} />
+    <div className="space-y-5 pb-6">
+      {/* Hero Command Card: Monthly Listeners + Goal Progress + Artist Intelligence */}
+      <section className="material-card p-5 sm:p-7">
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+            <div>
+              <div className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] text-[var(--text-muted)] uppercase">
+                <span>Monthly Listeners · {monthLabel}</span>
+                <TrendArrow trend={listenerTrend} />
+              </div>
+              <div className="mt-1 text-5xl sm:text-7xl font-bold tracking-tighter text-[var(--text-primary)] tabular-nums">
+                {metrics.monthlyListeners.toLocaleString()}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+              <span>Current Goal:</span>
+              <span className="rounded-full bg-[var(--bg-card-elevated)] px-2.5 py-1 font-bold text-[var(--text-primary)] tabular-nums">
+                {monthlyGoal.toLocaleString()}
+              </span>
+            </div>
           </div>
 
-          <div className="mt-10 w-full">
+          <div className="w-full">
             <div className="relative flex h-14 sm:h-16 w-full overflow-hidden rounded-full bg-gradient-to-b from-[#0C0E13] to-[#161922] ring-1 ring-white/[0.08] shadow-[inset_0_4px_10px_rgba(0,0,0,0.85),0_1px_0_rgba(255,255,255,0.08)]">
               <WaterProgressCanvas
                 fillPct={(() => {
@@ -370,12 +397,48 @@ export const DashboardTab: React.FC = () => {
               ))}
             </div>
           </div>
+
+          {/* Artist Intelligence Strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-[var(--border-subtle)]">
+            <div className="rounded-2xl bg-[var(--bg-card-elevated)] px-3.5 py-2.5">
+              <div className="text-[10px] font-semibold tracking-wider text-[var(--text-muted)] uppercase">
+                Pace Needed
+              </div>
+              <div className="mt-0.5 text-base font-bold text-[var(--text-primary)] tabular-nums">
+                {dailyPaceNeeded === 0 ? 'Goal Hit' : `+${dailyPaceNeeded}/day`}
+              </div>
+            </div>
+            <div className="rounded-2xl bg-[var(--bg-card-elevated)] px-3.5 py-2.5">
+              <div className="text-[10px] font-semibold tracking-wider text-[var(--text-muted)] uppercase">
+                Follower Conv.
+              </div>
+              <div className="mt-0.5 text-base font-bold text-[var(--text-primary)] tabular-nums">
+                {followerConversion}%
+              </div>
+            </div>
+            <div className="rounded-2xl bg-[var(--bg-card-elevated)] px-3.5 py-2.5">
+              <div className="text-[10px] font-semibold tracking-wider text-[var(--text-muted)] uppercase">
+                Streams / Listener
+              </div>
+              <div className="mt-0.5 text-base font-bold text-[var(--text-primary)] tabular-nums">
+                {streamsPerListener}x
+              </div>
+            </div>
+            <div className="rounded-2xl bg-[var(--bg-card-elevated)] px-3.5 py-2.5">
+              <div className="text-[10px] font-semibold tracking-wider text-[var(--text-muted)] uppercase">
+                High-Pri Tasks
+              </div>
+              <div className="mt-0.5 text-base font-bold text-[var(--text-primary)] tabular-nums">
+                {highPriorityPending === 0 ? 'All Clear' : `${highPriorityPending} pending`}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Scroll Down: Monthly Metrics Grouped by Platform */}
-      <section className="mx-auto w-full max-w-[360px] space-y-3 px-2 pt-2">
-        <div className="text-center text-[11px] font-semibold tracking-[0.16em] text-zinc-500 uppercase">
+      {/* Monthly Metrics Grouped by Platform */}
+      <section className="w-full space-y-4">
+        <div className="text-[11px] font-semibold tracking-[0.16em] text-[var(--text-muted)] uppercase">
           {monthLabel}
         </div>
 

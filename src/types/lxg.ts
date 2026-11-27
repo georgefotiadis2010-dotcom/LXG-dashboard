@@ -91,6 +91,75 @@ export type NewReelInput = Omit<ReelEntry, 'id' | 'engagementRate'> & {
   engagementRate?: number;
 };
 
+export type TelemetryPlatform = 'spotify' | 'instagram';
+
+export type TelemetryViewMode = TelemetryPlatform | 'all';
+
+export type TelemetryMonthCode = 'NOV' | 'DEC' | 'JAN' | 'FEB' | 'MAR' | 'APR';
+
+export interface TelemetryMilestone {
+  value: number;
+  label: string;
+}
+
+export interface TelemetrySecondaryStat {
+  id: string;
+  label: string;
+  value: number;
+  suffix?: string;
+  decimals?: number;
+  delta: string;
+  deltaPositive: boolean;
+}
+
+export interface TelemetryTopCallout {
+  kind: 'track' | 'reel';
+  title: string;
+  metricLabel: string;
+  metricValue: number;
+  delta: string;
+  meta: string;
+  accentTag?: string;
+}
+
+export interface TelemetryMonthSnapshot {
+  month: TelemetryMonthCode;
+  fullLabel: string;
+  heroValue: number;
+  delta: string;
+  deltaPositive: boolean;
+  secondaryStats: [
+    TelemetrySecondaryStat,
+    TelemetrySecondaryStat,
+    TelemetrySecondaryStat,
+  ];
+  sparkline: number[];
+  topCallout: TelemetryTopCallout;
+}
+
+export interface PlatformThemeTokens {
+  primary: string;
+  deep: string;
+  glowRgba: string;
+}
+
+export interface PlatformTelemetryConfig {
+  platform: TelemetryPlatform;
+  label: string;
+  handle: string;
+  heroLabel: string;
+  theme: PlatformThemeTokens;
+  milestones: TelemetryMilestone[];
+  timeline: TelemetryMonthSnapshot[];
+}
+
+export interface LxgTelemetryConfig {
+  artistName: string;
+  handle: string;
+  months: TelemetryMonthCode[];
+  platforms: Record<TelemetryPlatform, PlatformTelemetryConfig>;
+}
+
 export interface LxgContextValue {
   state: LxgState;
   incrementMetric: (key: MetricKey, delta: number) => void;
@@ -102,4 +171,19 @@ export interface LxgContextValue {
   replaceFromRemote: (remoteState: LxgState) => void;
   syncNow: () => Promise<void>;
   syncStatus: SyncStatus;
+  // Telemetry UI & data API
+  telemetry: LxgTelemetryConfig;
+  activePlatform: TelemetryViewMode;
+  setActivePlatform: (mode: TelemetryViewMode) => void;
+  activeMonthIndex: number;
+  setActiveMonthIndex: (index: number) => void;
+  isSheetOpen: boolean;
+  sheetPlatform: TelemetryPlatform;
+  focusedStatId: string | null;
+  openSheet: (platform?: TelemetryPlatform, statId?: string) => void;
+  closeSheet: () => void;
+  getPlatformSnapshot: (
+    platform: TelemetryPlatform,
+    monthIndex?: number
+  ) => TelemetryMonthSnapshot;
 }
